@@ -1,8 +1,8 @@
 Dialectica Spaces
 -----------------
 
-This is a formalization of dialectica spaces on the category DC in
-sets from Valeria de Paiva's thesis. 
+This is a formalization of dialectica spaces on the category GC --
+which we call Dial -- in sets from Valeria de Paiva's thesis.
 
 Dialectica spaces require the notion of a lineale. A lineale is
 essentially a symmetric monoidal closed category in the category of
@@ -15,7 +15,7 @@ poset-reflection of the notion of a monoidal closed category).
 
 Finally, we have dialectica spaces:
 
-- DC in sets can be found in [DCSets.agda](DCSets.agda)
+- Dial in sets can be found in [DialSets.agda](DialSets.agda)
 
 This formalization was developed and tested with Agda 2.4.2.4 and
 depends on the [Augusta University Agda Library](https://github.com/heades/AUGL).
