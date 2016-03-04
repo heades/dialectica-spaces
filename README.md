@@ -10,7 +10,7 @@ essentially a symmetric monoidal closed category in the category of
 partially ordered sets. (or A lineale corresponds to the
 poset-reflection of the notion of a monoidal closed category).
 
-- Basic definitions are defined in [ prelude.agda ]( prelude.agda ).
+- Basic definitions are defined in [ prelude.agda ]( prelude.agda )
 - Lineales are defined in [lineale.agda](lineale.agda)
 - Theorems about lineales can be found in [lineale-thms.agda](lineale-thms.agda)
 - Definitions of concrete lineales can be found in [concrete-lineales.agda](concrete-lineales.agda)
