@@ -10,49 +10,52 @@ open import lineale-thms
 -----------------------------------------------------------------------
 module DialSets {ℓ : Level}(L : Set ℓ) (l-pf : Lineale L) where
 
------------------------------------------------------------------------
--- Initial local definitions to make reading types easier            --
------------------------------------------------------------------------
-_≤L_ : L → L → Set
-x ≤L y = (rel (proset (mproset l-pf))) x y
+module DialSets-local-defs where
+  -----------------------------------------------------------------------
+  -- Initial local definitions to make reading types easier            --
+  -----------------------------------------------------------------------
+  _≤L_ : L → L → Set
+  x ≤L y = (rel (proset (mproset l-pf))) x y
 
-reflL : {a : L} → a ≤L a
-reflL = prefl (proset (mproset l-pf))
+  reflL : {a : L} → a ≤L a
+  reflL = prefl (proset (mproset l-pf))
+  
+  transL : {a b c : L} → a ≤L b → b ≤L c → a ≤L c
+  transL = ptrans (proset (mproset l-pf))
+  
+  compatL : {a : L} {b : L} → rel (proset (mproset l-pf)) a b →
+          {c : L} → rel (proset (mproset l-pf)) (mul (mproset l-pf) a c) (mul (mproset l-pf) b c)
+          
+  compatL = compat (mproset l-pf)
+  
+  _⊗L_ : L → L → L
+  x ⊗L y = mul (mproset l-pf) x y
+  
+  unitL = unit (mproset l-pf)
+  
+  left-identL : {a : L} → mul (mproset l-pf) (unit (mproset l-pf)) a ≡ a
+  left-identL = left-ident (mproset l-pf)
+  
+  right-identL : {a : L} → mul (mproset l-pf) a (unit (mproset l-pf)) ≡ a
+  right-identL = right-ident (mproset l-pf)
+  
+  assocL : {a b c : L} →
+         mul (mproset l-pf) a (mul (mproset l-pf) b c) ≡
+         mul (mproset l-pf) (mul (mproset l-pf) a b) c
+  assocL = assoc (mproset l-pf)
+  
+  symmL : {a b : L} → mul (mproset l-pf) a b ≡ mul (mproset l-pf) b a
+  symmL = symm (mproset l-pf)
+  
+  _→L_ : L → L → L
+  _→L_ = l-imp l-pf
+  
+  adjL : {a b y : L} →
+       rel (proset (mproset l-pf)) (mul (mproset l-pf) a y) b →
+       rel (proset (mproset l-pf)) y (l-imp l-pf a b)
+  adjL = adj l-pf
 
-transL : {a b c : L} → a ≤L b → b ≤L c → a ≤L c
-transL = ptrans (proset (mproset l-pf))
-
-compatL : {a : L} {b : L} → rel (proset (mproset l-pf)) a b →
-      {c : L} → rel (proset (mproset l-pf)) (mul (mproset l-pf) a c) (mul (mproset l-pf) b c)
-      
-compatL = compat (mproset l-pf)
-
-_⊗L_ : L → L → L
-x ⊗L y = mul (mproset l-pf) x y
-
-unitL = unit (mproset l-pf)
-
-left-identL : {a : L} → mul (mproset l-pf) (unit (mproset l-pf)) a ≡ a
-left-identL = left-ident (mproset l-pf)
-
-right-identL : {a : L} → mul (mproset l-pf) a (unit (mproset l-pf)) ≡ a
-right-identL = right-ident (mproset l-pf)
-
-assocL : {a b c : L} →
-      mul (mproset l-pf) a (mul (mproset l-pf) b c) ≡
-      mul (mproset l-pf) (mul (mproset l-pf) a b) c
-assocL = assoc (mproset l-pf)
-
-symmL : {a b : L} → mul (mproset l-pf) a b ≡ mul (mproset l-pf) b a
-symmL = symm (mproset l-pf)
-
-_→L_ : L → L → L
-_→L_ = l-imp l-pf
-
-adjL : {a b y : L} →
-      rel (proset (mproset l-pf)) (mul (mproset l-pf) a y) b →
-      rel (proset (mproset l-pf)) y (l-imp l-pf a b)
-adjL = adj l-pf
+open DialSets-local-defs
 
 -----------------------------------------------------------------------
 -- We have a category                                                --
@@ -62,6 +65,12 @@ adjL = adj l-pf
 Obj : Set (lsuc ℓ)
 Obj = Σ[ U ∈ Set ℓ ] (Σ[ X ∈ Set ℓ ] (U → X → L))
 
+obj-fst : Obj → Set ℓ
+obj-fst (U , X , α) = U
+
+obj-snd : Obj → Set ℓ
+obj-snd (U , X , α) = X
+  
 -- The morphisms:
 Hom : Obj → Obj → Set ℓ
 Hom (U , X , α) (V , Y , β) =
@@ -166,11 +175,6 @@ _⊗ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
 
 I : Obj
 I = (⊤ , ⊤ , ι)
-
-
-J : Obj
-J = (⊤ , ⊤ , (λ x y → unitL))
-
 
 -- The left-unitor:   
 λ⊗ : ∀{A : Obj} → Hom (I ⊗ₒ A) A

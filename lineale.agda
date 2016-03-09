@@ -43,3 +43,22 @@ record Lineale {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
    adj : {a b y : L} → (rel (proset mproset)) (mul mproset a y) b → (rel (proset mproset)) y (l-imp a b)
 
 open Lineale public
+
+record Full-Lineale {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
+ constructor MkFLineale    
+ field
+   lineale : Lineale L
+   
+   add : L → L → L
+   empty : L
+
+   a-assoc : ∀{a b c} → add a (add b c) ≡ add (add a b) c
+   a-symm  : ∀{a b} → add a b ≡ add b a
+   a-compat : ∀{a b} → (rel (proset (mproset lineale))) a b → (∀{c : L} → (rel (proset (mproset lineale))) (add a c) (add b c))    
+   a-left-ident : ∀{a} → add a empty ≡ a
+   a-right-ident : ∀{a} → add empty a ≡ a
+
+   left-absorp : ∀{a b c} → (rel (proset (mproset lineale))) (mul (mproset lineale) (add a b) c) (add a (mul (mproset lineale) b c))
+   right-absorp : ∀{a b c} → (rel (proset (mproset lineale))) (mul (mproset lineale) a (add b c)) (add (mul (mproset lineale) a b) c)
+
+open Full-Lineale public
