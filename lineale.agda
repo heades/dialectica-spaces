@@ -49,16 +49,34 @@ record Full-Lineale {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
  field
    lineale : Lineale L
    
-   add : L → L → L
+   par : L → L → L
    empty : L
+
+   f-assoc : ∀{a b c} → par a (par b c) ≡ par (par a b) c
+   f-symm  : ∀{a b} → par a b ≡ par b a
+   f-compat : ∀{a b} → (rel (proset (mproset lineale))) a b → (∀{c : L} → (rel (proset (mproset lineale))) (par a c) (par b c))    
+   f-left-ident : ∀{a} → par a empty ≡ a
+   f-right-ident : ∀{a} → par empty a ≡ a
+
+   f-left-absorp : ∀{a b c} → (rel (proset (mproset lineale))) (mul (mproset lineale) (par a b) c) (par a (mul (mproset lineale) b c))
+   f-right-absorp : ∀{a b c} → (rel (proset (mproset lineale))) (mul (mproset lineale) a (par b c)) (par (mul (mproset lineale) a b) c)
+
+record Add-Lineale {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
+ constructor MkALineale    
+ field
+   lineale : Lineale L
+
+   add : L → L → L
+   add-unit : L
 
    a-assoc : ∀{a b c} → add a (add b c) ≡ add (add a b) c
    a-symm  : ∀{a b} → add a b ≡ add b a
    a-compat : ∀{a b} → (rel (proset (mproset lineale))) a b → (∀{c : L} → (rel (proset (mproset lineale))) (add a c) (add b c))    
-   a-left-ident : ∀{a} → add a empty ≡ a
-   a-right-ident : ∀{a} → add empty a ≡ a
+   a-left-ident : ∀{a} → add a add-unit ≡ a
+   a-right-ident : ∀{a} → add add-unit a ≡ a
 
-   left-absorp : ∀{a b c} → (rel (proset (mproset lineale))) (mul (mproset lineale) (add a b) c) (add a (mul (mproset lineale) b c))
-   right-absorp : ∀{a b c} → (rel (proset (mproset lineale))) (mul (mproset lineale) a (add b c)) (add (mul (mproset lineale) a b) c)
-
-open Full-Lineale public
+   a-inj₁ : ∀{a b} → (rel (proset (mproset lineale))) a (add a b)
+   a-inj₂ : ∀{a b} → (rel (proset (mproset lineale))) b (add a b)
+   a-cop : ∀{a b c} → (rel (proset (mproset lineale))) a c → (rel (proset (mproset lineale))) b c → (rel (proset (mproset lineale))) (add a b) c
+   a-unit-least : ∀{a} → (rel (proset (mproset lineale))) add-unit a
+   

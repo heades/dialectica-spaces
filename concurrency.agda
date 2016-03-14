@@ -1,13 +1,14 @@
 open import prelude
 open import lineale
 
-module concurrency {ℓ : Level}(L : Set ℓ) (fl-pf : Full-Lineale L) where
+module concurrency {ℓ : Level}(L : Set ℓ) (fl-pf : Add-Lineale L) where
 
+open Add-Lineale
 open import DialSets L (lineale fl-pf)
 
 module concurrency-local-defs where
  ∅ : L
- ∅ = empty fl-pf
+ ∅ = add-unit fl-pf
 
  _≤L_ = rel (proset (mproset (lineale fl-pf)))
  reflL = prefl (proset (mproset (lineale fl-pf)))
@@ -29,7 +30,7 @@ _+_ : Obj → Obj → Obj
 +-terminalₐ : ∀{A} → Hom +-ident A
 +-terminalₐ {U , X , α} = (λ x → ⊥-elim {ℓ} x) , (λ x → triv) , (λ {u y} → cond {u}{y})
  where
-   cond : {u : ⊥ {ℓ}} {y : X} → (empty fl-pf) ≤L (α (⊥-elim u) y)
+   cond : {u : ⊥ {ℓ}} {y : X} → ∅ ≤L (α (⊥-elim u) y)
    cond {u}{x} = ⊥-elim {ℓ} u
 
 +-inj₁ : ∀{A B} → Hom A (A + B)
@@ -125,7 +126,7 @@ choose-left-ident : ∀{A} → Hom (choose J A) A
 choose-left-ident {U , X , α} = ⊎-left-ident , ⊎-left-ident-inv , (λ {u y} → cond {u}{y})
  where
   cond : {u : ⊥ ⊎ U} {y : X} →
-      (chooseᵣ {⊥ {ℓ}}{U}{⊥ {ℓ}} (λ x y₁ → empty fl-pf) α u (inj₂ y)) ≤L (α (⊎-left-ident u) y)
+      (chooseᵣ {⊥ {ℓ}}{U}{⊥ {ℓ}} (λ x y₁ → ∅) α u (inj₂ y)) ≤L (α (⊎-left-ident u) y)
   cond {inj₁ u}{x} = ⊥-elim {ℓ} u
   cond {inj₂ u}{x} = reflL
 
@@ -133,7 +134,7 @@ choose-left-ident-inv : ∀{A} → Hom A (choose J A)
 choose-left-ident-inv {U , X , α} = ⊎-left-ident-inv , ⊎-left-ident , ((λ {u y} → cond {u}{y}))
  where
   cond : {u : U} {y : ⊥ ⊎ X} →
-      (α u (⊎-left-ident y)) ≤L (chooseᵣ {⊥ {ℓ}} (λ x y₁ → empty fl-pf) α (inj₂ u) y)
+      (α u (⊎-left-ident y)) ≤L (chooseᵣ {⊥ {ℓ}} (λ x y₁ → ∅) α (inj₂ u) y)
   cond {y = inj₁ x} = ⊥-elim {ℓ} x
   cond {y = inj₂ y} = reflL
 
@@ -147,7 +148,7 @@ choose-right-ident : ∀{A} → Hom (choose A J) A
 choose-right-ident {U , X , α} = ⊎-right-ident , ⊎-right-ident-inv , (λ {u y} → cond {u}{y})
  where
   cond : {u : U ⊎ ⊥} {y : X} →      
-      (chooseᵣ {U}{⊥ {ℓ}}{X}{⊥ {ℓ}} α (λ x y₁ → empty fl-pf) u (inj₁ y)) ≤L (α (⊎-right-ident u) y)
+      (chooseᵣ {U}{⊥ {ℓ}}{X}{⊥ {ℓ}} α (λ x y₁ → ∅) u (inj₁ y)) ≤L (α (⊎-right-ident u) y)
   cond {inj₁ x} = reflL
   cond {inj₂ y} = ⊥-elim {ℓ} y
 
@@ -155,7 +156,7 @@ choose-right-ident-inv : ∀{A} → Hom A (choose A J)
 choose-right-ident-inv {U , X , α} = ⊎-right-ident-inv , ⊎-right-ident , (λ {u y} → cond {u}{y})
  where
   cond : {u : U} {y : X ⊎ ⊥} →
-      (α u (⊎-right-ident y)) ≤L (chooseᵣ {_}{⊥ {ℓ}} α (λ x y₁ → empty fl-pf) (inj₁ u) y)
+      (α u (⊎-right-ident y)) ≤L (chooseᵣ {_}{⊥ {ℓ}} α (λ x y₁ → ∅) (inj₁ u) y)
   cond {y = inj₁ x} = reflL
   cond {y = inj₂ y} = ⊥-elim {ℓ} y
 
@@ -164,3 +165,39 @@ choose-right-ident-iso₁ {U , X , α} = ext-set ⊎-right-ident-iso₁ , ext-se
 
 choose-right-ident-iso₂ : ∀{A} → choose-right-ident-inv {A} ○ choose-right-ident ≡h id
 choose-right-ident-iso₂ {U , X , α} = ext-set ⊎-right-ident-iso₂ , ext-set ⊎-right-ident-iso₂
+
+choose-+-dist : ∀{A B C : Obj} → Hom ((choose A C) + (choose B C)) ((choose A B) + C) 
+choose-+-dist {U , X , α}{V , Y , β}{W , Z , γ} = aux₁ , aux₂ , (λ {u y} → cond {u}{y})
+ where
+  aux₁ : (U ⊎ W) ⊎ V ⊎ W → (U ⊎ V) ⊎ W
+  aux₁ (inj₁ (inj₁ x)) = inj₁ (inj₁ x)
+  aux₁ (inj₁ (inj₂ y)) = inj₂ y
+  aux₁ (inj₂ (inj₁ x)) = inj₁ (inj₂ x)
+  aux₁ (inj₂ (inj₂ y)) = inj₂ y
+
+  aux₂ : Σ (X ⊎ Y) (λ x → Z) → Σ (X ⊎ Z) (λ x → Y ⊎ Z)
+  aux₂ (inj₁ x , b) = inj₁ x , inj₂ b
+  aux₂ (inj₂ y , b) = inj₂ b , inj₁ y
+
+  cond : {u : (U ⊎ W) ⊎ V ⊎ W} {y : Σ (X ⊎ Y) (λ x → Z)} →
+      (+-cond (chooseᵣ α γ) (chooseᵣ β γ) u (aux₂ y)) ≤L
+      (+-cond (chooseᵣ α β) γ (aux₁ u) y)
+  cond {inj₁ (inj₁ x)} {inj₁ x₁ , b} = reflL
+  cond {inj₁ (inj₁ x)} {inj₂ y , b} = reflL
+  cond {inj₁ (inj₂ x)} {inj₁ x₁ , b} = a-unit-least fl-pf
+  cond {inj₁ (inj₂ x)} {inj₂ y , b} = reflL
+  cond {inj₂ (inj₁ x)} {inj₁ x₁ , b} = reflL
+  cond {inj₂ (inj₁ x)} {inj₂ y , b} = reflL
+  cond {inj₂ (inj₂ x)} {inj₁ x₁ , b} = reflL
+  cond {inj₂ (inj₂ x)} {inj₂ y , b} = a-unit-least fl-pf
+
+choose-contract : ∀{A : Obj} → Hom (choose A A) A
+choose-contract {U , X , α} = aux₁ , inj₁ , (λ {u y} → cond {u}{y})
+ where
+  aux₁ : U ⊎ U → U
+  aux₁ (inj₁ x) = x
+  aux₁ (inj₂ y) = y
+
+  cond : {u : U ⊎ U} {y : X} → (chooseᵣ α α u (inj₁ y)) ≤L (α (aux₁ u) y)
+  cond {inj₁ u}{x} = reflL
+  cond {inj₂ u}{x} = a-unit-least fl-pf
