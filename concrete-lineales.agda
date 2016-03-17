@@ -494,6 +494,248 @@ isLineale3 = MkLineale isMonProset3 _→3_ aux (λ {a b y} → aux' a b y)
    aux' one one half x = triv
    aux' one one one x = triv
 
+add3 : Three → Three → Three
+add3 zero zero = zero
+add3 zero half = half
+add3 zero one = one
+add3 half zero = half
+add3 half half = half
+add3 half one = one
+add3 one zero = one
+add3 one half = one
+add3 one one = one
+
+isALineale3 : Add-Lineale Three
+isALineale3 = MkALineale isLineale3 add3 zero (λ {a b c} → aux₇ {a}{b}{c})
+                                              (λ{a b} → aux₈ {a}{b})
+                                              (λ {a b} → aux₆ {a}{b})
+                                              aux₁ aux₂
+                                              (λ{a b} → aux₃ {a}{b})
+                                              (λ{a b} → aux₄ {a}{b})
+                                              (λ {a b c} → aux₅ {a}{b}{c})
+                                              triv
+ where
+   aux₁ : {a : Three} → add3 a zero ≡ a
+   aux₁ {zero} = refl
+   aux₁ {half} = refl
+   aux₁ {one} = refl
+
+   aux₂ : {a : Three} → add3 zero a ≡ a
+   aux₂ {zero} = refl
+   aux₂ {half} = refl
+   aux₂ {one} = refl
+
+   aux₃ : {a b : Three} → a ≤3 add3 a b
+   aux₃ {zero} {zero} = triv
+   aux₃ {zero} {half} = triv
+   aux₃ {zero} {one} = triv
+   aux₃ {half} {zero} = triv
+   aux₃ {half} {half} = triv
+   aux₃ {half} {one} = triv
+   aux₃ {one} {zero} = triv
+   aux₃ {one} {half} = triv
+   aux₃ {one} {one} = triv
+   
+   aux₄ : {a b : Three} → b ≤3 add3 a b
+   aux₄ {zero} {zero} = triv
+   aux₄ {zero} {half} = triv
+   aux₄ {zero} {one} = triv
+   aux₄ {half} {zero} = triv
+   aux₄ {half} {half} = triv
+   aux₄ {half} {one} = triv
+   aux₄ {one} {zero} = triv
+   aux₄ {one} {half} = triv
+   aux₄ {one} {one} = triv
+
+   aux₅ : {a b c : Three} → a ≤3 c → b ≤3 c → add3 a b ≤3 c
+   aux₅ {zero} {zero} {zero} x x₁ = triv
+   aux₅ {zero} {zero} {half} x x₁ = triv
+   aux₅ {zero} {zero} {one} x x₁ = triv
+   aux₅ {zero} {half} {zero} x x₁ = x₁
+   aux₅ {zero} {half} {half} x x₁ = triv
+   aux₅ {zero} {half} {one} x x₁ = triv
+   aux₅ {zero} {one} {zero} x x₁ = x₁
+   aux₅ {zero} {one} {half} x x₁ = x₁
+   aux₅ {zero} {one} {one} x x₁ = triv
+   aux₅ {half} {zero} {zero} x x₁ = x
+   aux₅ {half} {zero} {half} x x₁ = triv
+   aux₅ {half} {zero} {one} x x₁ = triv
+   aux₅ {half} {half} {zero} x x₁ = x
+   aux₅ {half} {half} {half} x x₁ = triv
+   aux₅ {half} {half} {one} x x₁ = triv
+   aux₅ {half} {one} {zero} x x₁ = x
+   aux₅ {half} {one} {half} x x₁ = x₁
+   aux₅ {half} {one} {one} x x₁ = triv
+   aux₅ {one} {zero} {zero} x x₁ = x
+   aux₅ {one} {zero} {half} x x₁ = x
+   aux₅ {one} {zero} {one} x x₁ = triv
+   aux₅ {one} {half} {zero} x x₁ = x
+   aux₅ {one} {half} {half} x x₁ = x
+   aux₅ {one} {half} {one} x x₁ = triv
+   aux₅ {one} {one} {zero} x x₁ = x
+   aux₅ {one} {one} {half} x x₁ = x
+   aux₅ {one} {one} {one} x x₁ = triv
+
+   aux₆ : {a b : Three} → a ≤3 b → {c : Three} → add3 a c ≤3 add3 b c
+   aux₆ {zero} {zero} x {zero} = triv
+   aux₆ {zero} {zero} x {half} = triv
+   aux₆ {zero} {zero} x {one} = triv
+   aux₆ {zero} {half} x {zero} = triv
+   aux₆ {zero} {half} x {half} = triv
+   aux₆ {zero} {half} x {one} = triv
+   aux₆ {zero} {one} x {zero} = triv
+   aux₆ {zero} {one} x {half} = triv
+   aux₆ {zero} {one} x {one} = triv
+   aux₆ {half} {zero} x {zero} = x
+   aux₆ {half} {zero} x {half} = triv
+   aux₆ {half} {zero} x {one} = triv
+   aux₆ {half} {half} x {zero} = triv
+   aux₆ {half} {half} x {half} = triv
+   aux₆ {half} {half} x {one} = triv
+   aux₆ {half} {one} x {zero} = triv
+   aux₆ {half} {one} x {half} = triv
+   aux₆ {half} {one} x {one} = triv
+   aux₆ {one} {zero} x {zero} = x
+   aux₆ {one} {zero} x {half} = x
+   aux₆ {one} {zero} x {one} = triv
+   aux₆ {one} {half} x {zero} = x
+   aux₆ {one} {half} x {half} = x
+   aux₆ {one} {half} x {one} = triv
+   aux₆ {one} {one} x {zero} = triv
+   aux₆ {one} {one} x {half} = triv
+   aux₆ {one} {one} x {one} = triv
+
+   aux₇ : {a b c : Three} → add3 a (add3 b c) ≡ add3 (add3 a b) c
+   aux₇ {zero} {zero} {zero} = refl
+   aux₇ {zero} {zero} {half} = refl
+   aux₇ {zero} {zero} {one} = refl
+   aux₇ {zero} {half} {zero} = refl
+   aux₇ {zero} {half} {half} = refl
+   aux₇ {zero} {half} {one} = refl
+   aux₇ {zero} {one} {zero} = refl
+   aux₇ {zero} {one} {half} = refl
+   aux₇ {zero} {one} {one} = refl
+   aux₇ {half} {zero} {zero} = refl
+   aux₇ {half} {zero} {half} = refl
+   aux₇ {half} {zero} {one} = refl
+   aux₇ {half} {half} {zero} = refl
+   aux₇ {half} {half} {half} = refl
+   aux₇ {half} {half} {one} = refl
+   aux₇ {half} {one} {zero} = refl
+   aux₇ {half} {one} {half} = refl
+   aux₇ {half} {one} {one} = refl
+   aux₇ {one} {zero} {zero} = refl
+   aux₇ {one} {zero} {half} = refl
+   aux₇ {one} {zero} {one} = refl
+   aux₇ {one} {half} {zero} = refl
+   aux₇ {one} {half} {half} = refl
+   aux₇ {one} {half} {one} = refl
+   aux₇ {one} {one} {zero} = refl
+   aux₇ {one} {one} {half} = refl
+   aux₇ {one} {one} {one} = refl
+
+   aux₈ : {a b : Three} → add3 a b ≡ add3 b a
+   aux₈ {zero} {zero} = refl
+   aux₈ {zero} {half} = refl
+   aux₈ {zero} {one} = refl
+   aux₈ {half} {zero} = refl
+   aux₈ {half} {half} = refl
+   aux₈ {half} {one} = refl
+   aux₈ {one} {zero} = refl
+   aux₈ {one} {half} = refl
+   aux₈ {one} {one} = refl
+
+land : Three → Three → Three
+land zero zero = zero
+land zero half = zero
+land zero one = zero
+land half zero = half
+land half half = half
+land half one = half
+land one zero = zero
+land one half = half
+land one one = one
+
+land-assoc : {a b c : Three} → land a (land b c) ≡ land (land a b) c
+land-assoc {zero} {zero} {zero} = refl
+land-assoc {zero} {zero} {half} = refl
+land-assoc {zero} {zero} {one} = refl
+land-assoc {zero} {half} {zero} = refl
+land-assoc {zero} {half} {half} = refl
+land-assoc {zero} {half} {one} = refl
+land-assoc {zero} {one} {zero} = refl
+land-assoc {zero} {one} {half} = refl
+land-assoc {zero} {one} {one} = refl
+land-assoc {half} {zero} {zero} = refl
+land-assoc {half} {zero} {half} = refl
+land-assoc {half} {zero} {one} = refl
+land-assoc {half} {half} {zero} = refl
+land-assoc {half} {half} {half} = refl
+land-assoc {half} {half} {one} = refl
+land-assoc {half} {one} {zero} = refl
+land-assoc {half} {one} {half} = refl
+land-assoc {half} {one} {one} = refl
+land-assoc {one} {zero} {zero} = refl
+land-assoc {one} {zero} {half} = refl
+land-assoc {one} {zero} {one} = refl
+land-assoc {one} {half} {zero} = refl
+land-assoc {one} {half} {half} = refl
+land-assoc {one} {half} {one} = refl
+land-assoc {one} {one} {zero} = refl
+land-assoc {one} {one} {half} = refl
+land-assoc {one} {one} {one} = refl
+
+land-proj₁ : {a b : Three} → land a b ≤3 a
+land-proj₁ {zero} {zero} = triv
+land-proj₁ {zero} {half} = triv
+land-proj₁ {zero} {one} = triv
+land-proj₁ {half} {zero} = triv
+land-proj₁ {half} {half} = triv
+land-proj₁ {half} {one} = triv
+land-proj₁ {one} {zero} = triv
+land-proj₁ {one} {half} = triv
+land-proj₁ {one} {one} = triv
+
+-- Since land is non-commutative the second projection doesn't hold:
+-- land-proj₂ : {a b : Three} → land a b ≤3 b
+-- land-proj₂ {zero} {zero} = triv
+-- land-proj₂ {zero} {half} = triv
+-- land-proj₂ {zero} {one} = triv
+-- land-proj₂ {half} {zero} = {!!}
+-- land-proj₂ {half} {half} = triv
+-- land-proj₂ {half} {one} = triv
+-- land-proj₂ {one} {zero} = triv
+-- land-proj₂ {one} {half} = triv
+-- land-proj₂ {one} {one} = triv
+
+land-ctr : ∀{c a b} → c ≤3 a → c ≤3 b → c ≤3 (land a b)
+land-ctr {zero} {zero} {zero} x x₁ = triv
+land-ctr {zero} {zero} {half} x x₁ = triv
+land-ctr {zero} {zero} {one} x x₁ = triv
+land-ctr {zero} {half} {zero} x x₁ = triv
+land-ctr {zero} {half} {half} x x₁ = triv
+land-ctr {zero} {half} {one} x x₁ = triv
+land-ctr {zero} {one} {zero} x x₁ = triv
+land-ctr {zero} {one} {half} x x₁ = triv
+land-ctr {zero} {one} {one} x x₁ = triv
+land-ctr {half} {zero} {zero} x x₁ = x
+land-ctr {half} {zero} {half} x x₁ = x
+land-ctr {half} {zero} {one} x x₁ = x
+land-ctr {half} {half} {zero} x x₁ = triv
+land-ctr {half} {half} {half} x x₁ = triv
+land-ctr {half} {half} {one} x x₁ = triv
+land-ctr {half} {one} {zero} x x₁ = x₁
+land-ctr {half} {one} {half} x x₁ = triv
+land-ctr {half} {one} {one} x x₁ = triv
+land-ctr {one} {zero} {zero} x x₁ = x
+land-ctr {one} {zero} {half} x x₁ = x
+land-ctr {one} {zero} {one} x x₁ = x
+land-ctr {one} {half} {zero} x x₁ = x
+land-ctr {one} {half} {half} x x₁ = x
+land-ctr {one} {half} {one} x x₁ = x
+land-ctr {one} {one} {zero} x x₁ = x₁
+land-ctr {one} {one} {half} x x₁ = x₁
+land-ctr {one} {one} {one} x x₁ = triv
 
 -----------------------------------------------------------------------
 -- The lineale 4                                                     --

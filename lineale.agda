@@ -64,19 +64,21 @@ record Full-Lineale {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
 record Add-Lineale {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
  constructor MkALineale    
  field
-   lineale : Lineale L
+   a-lineale : Lineale L
 
    add : L → L → L
    add-unit : L
 
    a-assoc : ∀{a b c} → add a (add b c) ≡ add (add a b) c
    a-symm  : ∀{a b} → add a b ≡ add b a
-   a-compat : ∀{a b} → (rel (proset (mproset lineale))) a b → (∀{c : L} → (rel (proset (mproset lineale))) (add a c) (add b c))    
+   a-compat : ∀{a b} → (rel (proset (mproset a-lineale))) a b → (∀{c : L} → (rel (proset (mproset a-lineale))) (add a c) (add b c))    
    a-left-ident : ∀{a} → add a add-unit ≡ a
    a-right-ident : ∀{a} → add add-unit a ≡ a
 
-   a-inj₁ : ∀{a b} → (rel (proset (mproset lineale))) a (add a b)
-   a-inj₂ : ∀{a b} → (rel (proset (mproset lineale))) b (add a b)
-   a-cop : ∀{a b c} → (rel (proset (mproset lineale))) a c → (rel (proset (mproset lineale))) b c → (rel (proset (mproset lineale))) (add a b) c
-   a-unit-least : ∀{a} → (rel (proset (mproset lineale))) add-unit a
+   a-inj₁ : ∀{a b} → (rel (proset (mproset a-lineale))) a (add a b)
+   a-inj₂ : ∀{a b} → (rel (proset (mproset a-lineale))) b (add a b)
+   a-cop : ∀{a b c} → (rel (proset (mproset a-lineale))) a c → (rel (proset (mproset a-lineale))) b c → (rel (proset (mproset a-lineale))) (add a b) c
+   a-unit-least : ∀{a} → (rel (proset (mproset a-lineale))) add-unit a
+
+open Add-Lineale public
    
