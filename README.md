@@ -20,6 +20,9 @@ Finally, we have the two types of dialectica spaces:
 - DC over sets can be found in [DCSets.agda](DCSets.agda)
 - Dial over sets can be found in [DialSets.agda](DialSets.agda)
 
+Concurrency operators defined over DCSets instantiated to the three
+element concrete lineale can be found in
+[concurrency.agda](concurrency.agda).
+
 This formalization was developed and tested with Agda 2.4.2.4 and
-depends on the [Augusta University Agda
-Library](https://github.com/heades/AUGL).
+depends on the [Augusta University Agda Library](https://github.com/heades/AUGL). 

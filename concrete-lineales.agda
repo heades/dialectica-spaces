@@ -336,6 +336,17 @@ half ⊗3 half = half
 half ⊗3 one = one
 one ⊗3 half = one
 
+symm3 : {a b : Three} → a ⊗3 b ≡ b ⊗3 a
+symm3 {zero} {zero} = refl
+symm3 {zero} {half} = refl
+symm3 {zero} {one} = refl
+symm3 {half} {zero} = refl
+symm3 {half} {half} = refl
+symm3 {half} {one} = refl
+symm3 {one} {zero} = refl
+symm3 {one} {half} = refl
+symm3 {one} {one} = refl
+
 isMonProset3 : MonProset Three
 isMonProset3 = MkMonProset _⊗3_ half isProset3 (λ {a b c} → assoc3 {a}{b}{c}) left-ident3 right-ident3 (λ {a b} → symm3 {a}{b}) (λ {a b} → comp3 {a}{b})
  where
@@ -376,18 +387,7 @@ isMonProset3 = MkMonProset _⊗3_ half isProset3 (λ {a b c} → assoc3 {a}{b}{c
    right-ident3 : {a : Three} → a ⊗3 half ≡ a
    right-ident3 {zero} = refl
    right-ident3 {half} = refl
-   right-ident3 {one} = refl
-
-   symm3 : {a b : Three} → a ⊗3 b ≡ b ⊗3 a
-   symm3 {zero} {zero} = refl
-   symm3 {zero} {half} = refl
-   symm3 {zero} {one} = refl
-   symm3 {half} {zero} = refl
-   symm3 {half} {half} = refl
-   symm3 {half} {one} = refl
-   symm3 {one} {zero} = refl
-   symm3 {one} {half} = refl
-   symm3 {one} {one} = refl
+   right-ident3 {one} = refl   
 
    comp3 : {a b : Three} → a ≤3 b → {c : Three} → (a ⊗3 c) ≤3 (b ⊗3 c)
    comp3 {zero} {zero} x {zero} = triv

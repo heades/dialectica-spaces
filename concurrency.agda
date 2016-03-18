@@ -18,8 +18,6 @@ module local-defs where
 
 open local-defs
 
-_⊗_ = _⊗ₒ_
-
 seq-rel : ∀{U X V Y : Set} → (U → X → Three) → (V → Y → Three) → (U × V) → (X × Y) → Three
 seq-rel α β (u , v) (x , y) = land (α u x) (β v y)
 
@@ -97,24 +95,24 @@ choice-seq-dist-iso₂ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux₁ , e
 _⊙_ : Obj → Obj → Obj
 (U , X , α) ⊙ (V , Y , β) = (U × V) , (X × Y) , ⊙-rel α β
 
+choice-para-dist-aux₁ : {U V W : Set} → Σ (U ⊎ V) (λ x → W) → Σ U (λ x → W) ⊎ Σ V (λ x → W)
+choice-para-dist-aux₁ (inj₁ a , b) = inj₁ (a , b)
+choice-para-dist-aux₁ (inj₂ a , b) = inj₂ (a , b)
+
+choice-para-dist-aux₂ : {X Y Z : Set} → Σ X (λ x → Z) ⊎ Σ Y (λ x → Z) → Σ (X ⊎ Y) (λ x → Z)
+choice-para-dist-aux₂ (inj₁ (a , b)) = inj₁ a , b  
+choice-para-dist-aux₂ (inj₂ (a , b)) = inj₂ a , b
+
 choice-para-dist : {A B C : Obj} → Hom ((choose A B) ⊙ C) (choose (A ⊙ C) (B ⊙ C))
-choice-para-dist {U , X , α}{V , Y , β}{W , Z , γ} = aux₁ , aux₂ , (λ {u y} → cond {u}{y})
+choice-para-dist {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-dist-aux₁ , choice-para-dist-aux₂ , (λ {u y} → cond {u}{y})
  where
-  aux₁ : Σ (U ⊎ V) (λ x → W) → Σ U (λ x → W) ⊎ Σ V (λ x → W)
-  aux₁ (inj₁ a , b) = inj₁ (a , b)
-  aux₁ (inj₂ a , b) = inj₂ (a , b)
-
-  aux₂ : Σ X (λ x → Z) ⊎ Σ Y (λ x → Z) → Σ (X ⊎ Y) (λ x → Z)
-  aux₂ (inj₁ (a , b)) = inj₁ a , b  
-  aux₂ (inj₂ (a , b)) = inj₂ a , b
-
   cond : {u : Σ (U ⊎ V) (λ x → W)}
       {y : Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)} →
       ⊙-rel
       (chooseᵣ α β)
-      γ u (aux₂ y)
+      γ u (choice-para-dist-aux₂ y)
       ≤3
-      chooseᵣ (⊙-rel α γ) (⊙-rel β γ) (aux₁ u) y
+      chooseᵣ (⊙-rel α γ) (⊙-rel β γ) (choice-para-dist-aux₁ u) y
   cond {inj₁ a , b} {inj₁ (x , y)} = reflL {α a x ⊗3 γ b y}
   cond {inj₁ a , b} {inj₂ (x , y)} with γ b y
   cond {inj₁ a , b} {inj₂ (x , y)} | zero = triv
@@ -125,3 +123,55 @@ choice-para-dist {U , X , α}{V , Y , β}{W , Z , γ} = aux₁ , aux₂ , (λ {u
   cond {inj₂ a , b} {inj₁ (x , y)} | half = triv
   cond {inj₂ a , b} {inj₁ (x , y)} | one = triv
   cond {inj₂ a , b} {inj₂ (x , y)} = reflL {β a x ⊗3 γ b y}
+
+choice-para-dist-inv-aux₁ : {U V W : Set} → Σ U (λ x → W) ⊎ Σ V (λ x → W) → Σ (U ⊎ V) (λ x → W)
+choice-para-dist-inv-aux₁ (inj₁ (a , b)) = inj₁ a , b
+choice-para-dist-inv-aux₁ (inj₂ (a , b)) = inj₂ a , b
+
+choice-para-dist-inv-aux₂ : {X Y Z : Set} → Σ (X ⊎ Y) (λ x → Z) → Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)
+choice-para-dist-inv-aux₂ (inj₁ a , b) = inj₁ (a , b)
+choice-para-dist-inv-aux₂ (inj₂ a , b) = inj₂ (a , b)
+  
+choice-para-dist-inv : {A B C : Obj} → Hom (choose (A ⊙ C) (B ⊙ C)) ((choose A B) ⊙ C)
+choice-para-dist-inv {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-dist-inv-aux₁ , (choice-para-dist-inv-aux₂ , (λ {u y} → cond {u}{y}))
+ where
+   cond : {u : Σ U (λ x → W) ⊎ Σ V (λ x → W)}
+      {y : Σ (X ⊎ Y) (λ x → Z)} →
+       chooseᵣ (⊙-rel α γ) (⊙-rel β γ) u (choice-para-dist-inv-aux₂ y)
+      ≤3
+      ⊙-rel
+      (chooseᵣ α β)
+      γ (choice-para-dist-inv-aux₁ u) y
+   cond {inj₁ (a , b)} {inj₁ x , y} = reflL {α a x ⊗3 γ b y}
+   cond {inj₁ (a , b)} {inj₂ x , y} = triv
+   cond {inj₂ (a , b)} {inj₁ x , y} = triv
+   cond {inj₂ (a , b)} {inj₂ x , y} = reflL {β a x ⊗3 γ b y}
+
+choice-para-dist-iso₁ : {A B C : Obj} → choice-para-dist {A}{B}{C} ○ choice-para-dist-inv ≡h id {(choose A B) ⊙ C}
+choice-para-dist-iso₁ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux₁ , ext-set aux₂
+ where
+   aux₁ : {a : Σ (U ⊎ V) (λ x → W)} → choice-para-dist-inv-aux₁ (choice-para-dist-aux₁ a) ≡ a
+   aux₁ {inj₁ x , b} = refl
+   aux₁ {inj₂ y , b} = refl
+
+   aux₂ : {a : Σ (X ⊎ Y) (λ x → Z)} → choice-para-dist-aux₂ (choice-para-dist-inv-aux₂ a) ≡ a
+   aux₂ {inj₁ x , b} = refl
+   aux₂ {inj₂ y , b} = refl
+
+choice-para-dist-iso₂ : {A B C : Obj} → choice-para-dist-inv {A}{B}{C} ○ choice-para-dist ≡h id {choose (A ⊙ C) (B ⊙ C)}
+choice-para-dist-iso₂ {U , X , α}{V , Y , β}{W , Z , γ} = (ext-set aux₁) , ext-set aux₂
+ where
+   aux₁ : {a : Σ U (λ x → W) ⊎ Σ V (λ x → W)} → choice-para-dist-aux₁ (choice-para-dist-inv-aux₁ a) ≡ a
+   aux₁ {inj₁ (a , b)} = refl
+   aux₁ {inj₂ (a , b)} = refl
+
+   aux₂ : {a : Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)} → choice-para-dist-inv-aux₂ (choice-para-dist-aux₂ a) ≡ a
+   aux₂ {inj₁ (a , b)} = refl
+   aux₂ {inj₂ (a , b)} = refl
+
+para-sym : {A B : Obj} → Hom (A ⊙ B) (B ⊙ A)
+para-sym {U , X , α}{V , Y , β} = twist-× , twist-× , (λ {u x} → cond {u}{x})
+ where
+  cond : {u : Σ U (λ x → V)} {y : Σ Y (λ x → X)} → ⊙-rel α β u (twist-× y) ≤3 ⊙-rel β α (twist-× u) y
+  cond {u , v}{y , x} rewrite symm3 {α u x}{β v y} = reflL {β v y ⊗3 α u x}
+
