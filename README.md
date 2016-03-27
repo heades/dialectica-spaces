@@ -20,7 +20,7 @@ Finally, we have the two types of dialectica spaces:
 - DC over sets can be found in [DCSets.agda](DCSets.agda)
 - Dial over sets can be found in [DialSets.agda](DialSets.agda)
 
-Concurrency operators defined in DCSets instantiated to the three
+Concurrency operators defined in DialSets instantiated to the three
 element concrete lineale can be found in
 [concurrency.agda](concurrency.agda).
 
