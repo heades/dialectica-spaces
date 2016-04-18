@@ -157,22 +157,21 @@ isMonProset3 = MkMonProset _⊕3_ half isProset3 (λ {a b c} → assoc3 {a}{b}{c
    comp3 {one} {one} x {half} = triv
    comp3 {one} {one} x {one} = triv
 
-_-3_ : Three → Three → Three
-
-zero -3 zero = zero
-zero -3 one = one
-one -3 zero = zero
-one -3 one = zero
-half -3 zero = one
-zero -3 half = one
-half -3 one = one
-half -3 half = half
-one -3 half = one
+_-_ : Three → Three → Three
+zero - zero = zero
+zero - one = one
+one - zero = zero
+one - one = zero
+half - zero = one
+zero - half = one
+half - one = one
+half - half = half
+one - half = one
 
 isColineale3 : Colineale Three
-isColineale3 = MkColineale isMonProset3 _-3_ aux₁ (λ {a b c} → aux₂ {a}{b}{c})
+isColineale3 = MkColineale isMonProset3 _-_ aux₁ (λ {a b c} → aux₂ {a}{b}{c})
  where
-  aux₁ : (a b : Three) → b ≤3 (a ⊕3 (a -3 b))
+  aux₁ : (a b : Three) → b ≤3 (a ⊕3 (a - b))
   aux₁ zero zero = triv
   aux₁ zero half = triv
   aux₁ zero one = triv
@@ -183,7 +182,7 @@ isColineale3 = MkColineale isMonProset3 _-3_ aux₁ (λ {a b c} → aux₂ {a}{b
   aux₁ one half = triv
   aux₁ one one = triv
 
-  aux₂ : {a b c : Three} → (b -3 c) ≤3 a → c ≤3 (a ⊕3 b)
+  aux₂ : {a b c : Three} → (b - c) ≤3 a → c ≤3 (a ⊕3 b)
   aux₂ {zero} {zero} {zero} x = triv
   aux₂ {zero} {zero} {half} x = x
   aux₂ {zero} {zero} {one} x = x

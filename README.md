@@ -24,5 +24,5 @@ Concurrency operators defined in DialSets instantiated to the three
 element concrete lineale can be found in
 [concurrency.agda](concurrency.agda).
 
-This formalization was developed and tested with Agda 2.4.2.4 and
+This formalization was developed and tested with Agda 2.5.1 and
 depends on the [Augusta University Agda Library](https://github.com/heades/AUGL). 
