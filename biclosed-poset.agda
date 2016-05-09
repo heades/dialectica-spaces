@@ -2,7 +2,7 @@
 -- This module defines Biclosed Posets which are essentially  --
 -- non-commutative lineales with two implications.            --
 ----------------------------------------------------------------
-module biclosed-posets where
+module biclosed-poset where
 
 open import prelude
 
