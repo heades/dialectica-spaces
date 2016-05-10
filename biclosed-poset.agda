@@ -33,7 +33,7 @@ record ONCMonoid {ℓ : Level}(P : Set ℓ) : Set (lsuc ℓ) where
 open ONCMonoid public
 
 record BiclosedPoset {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
- constructor MkLineale
+ constructor MkBiclosedPoset
  field
    oncMonoid : ONCMonoid L
    l-imp : L → L → L -- a ⇀ b = l-imp a b
