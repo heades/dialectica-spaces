@@ -15,10 +15,10 @@ module DialSets-local-defs where
   -- Initial local definitions to make reading types easier            --
   -----------------------------------------------------------------------
   _≤M_ : M → M → Set
-  x ≤M y = (rel (poset (oncMonoid bp-pf))) x y
+  _≤M_ = (rel (poset (oncMonoid bp-pf)))
 
   _⊗M_ : M → M → M
-  x ⊗M y = mul (oncMonoid bp-pf) x y
+  _⊗M_ = mul (oncMonoid bp-pf)
 
   reflM : {a : M} → a ≤M a
   reflM = prefl (poset (oncMonoid bp-pf))
@@ -47,8 +47,7 @@ module DialSets-local-defs where
   right-identM = right-ident (oncMonoid bp-pf)
   
   assocM : {a b c : M} →
-         a ⊗M (b ⊗M c) ≡
-         (a b) c
+         a ⊗M (b ⊗M c) ≡ (a ⊗M b) ⊗M c
   assocM = assoc (oncMonoid bp-pf)
   
   _⇀M_ : M → M → M
@@ -57,14 +56,12 @@ module DialSets-local-defs where
   _↼M_ : M → M → M
   _↼M_ = r-imp bp-pf
   
-  l-adjM : {a b y : M} →
-       rel (poset (oncMonoid bp-pf)) (mul (oncMonoid bp-pf) a y) b →
-       rel (poset (oncMonoid bp-pf)) y (l-imp bp-pf a b)
+  l-adjM : {a b y : M}
+    → (a ⊗M y) ≤M b → y ≤M (a ⇀M b)
   l-adjM = l-adj bp-pf
 
-  r-adjM : {a b y : M} →
-       rel (poset (oncMonoid bp-pf)) (mul (oncMonoid bp-pf) y a) b →
-       rel (poset (oncMonoid bp-pf)) y (r-imp bp-pf b a)
+  r-adjM : {a b y : M}
+    → (y ⊗M a) ≤M b → y ≤M (b ↼M a)
   r-adjM = r-adj bp-pf
 
   l-rlcompM : (a b : M) → (a ⊗M (a ⇀M b)) ≤M b
