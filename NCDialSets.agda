@@ -1,16 +1,20 @@
+--------------------------------------------------------------------------------------------
+-- The definition of the non-commutative dialectica category GC on Sets                   --
+-- parameterized by an arbitrary bi-closed poset.  GC is described in                     --
+-- Valeria de Paiva's thesis:                                                             --
+--   http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-213.pdf                               --
+--                                                                                        --
+-- This particular formalization is due to Valeria de Paiva:                              --
+--    http://www.slideshare.net/valeria.depaiva/a-dialectica-model-of-the-lambek-calculus --
+--------------------------------------------------------------------------------------------
+
 open import prelude
 open import biclosed-poset
 open import biclosed-poset-thms 
 
------------------------------------------------------------------------
--- The definition of the dialectica category GC on Sets              --
--- parameterized by an arbitrary lineale.  GC is described in        --
--- Valeria de Paiva's thesis:                                        --
---   http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-213.pdf          --
------------------------------------------------------------------------
 module NCDialSets {ℓ : Level}(M : Set ℓ) (bp-pf : BiclosedPoset M) where
 
-module DialSets-local-defs where
+module NCDialSets-local-defs where
   -----------------------------------------------------------------------
   -- Initial local definitions to make reading types easier            --
   -----------------------------------------------------------------------
@@ -70,7 +74,7 @@ module DialSets-local-defs where
   r-rlcompM : (a b : M) → ((b ↼M a) ⊗M a) ≤M b
   r-rlcompM = r-rlcomp bp-pf
 
-open DialSets-local-defs
+open NCDialSets-local-defs
 
 -----------------------------------------------------------------------
 -- We have a category                                                --
