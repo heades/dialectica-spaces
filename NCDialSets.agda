@@ -19,34 +19,37 @@ module NCDialSets-local-defs where
   -----------------------------------------------------------------------
   -- Initial local definitions to make reading types easier            --
   -----------------------------------------------------------------------
-  record _≤M_ (a : M)(b : M) : Set₁ where
-    constructor Mk≤M
-    field
-      ≤M-pf : (rel (poset (oncMonoid bp-pf))) a b
-  open _≤M_ public
-  
+  _≤M_ : M → M → Set
+  _≤M_ = (rel (poset (oncMonoid bp-pf)))
+
+  {-# DISPLAY rel = _≤M_  #-}
+
   _⊗M_ : M → M → M
   _⊗M_ = mul (oncMonoid bp-pf)
 
+  {-# DISPLAY mul = _⊗M_  #-}
+
   reflM : {a : M} → a ≤M a
-  reflM {a} = Mk≤M (prefl (poset (oncMonoid bp-pf)))
+  reflM {a} = prefl (poset (oncMonoid bp-pf))
   
   transM : {a b c : M} → a ≤M b → b ≤M c → a ≤M c
-  transM (Mk≤M p₁) (Mk≤M p₂) = Mk≤M ((ptrans (poset (oncMonoid bp-pf))) p₁ p₂)
+  transM p₁ p₂ = (ptrans (poset (oncMonoid bp-pf))) p₁ p₂
   
   compatM-r : {a : M} {b : M}
     → a ≤M b
     → {c : M}
     → (a ⊗M c) ≤M (b ⊗M c)          
-  compatM-r (Mk≤M p) = Mk≤M (compat-r (oncMonoid bp-pf) p)
+  compatM-r p = compat-r (oncMonoid bp-pf) p
 
   compatM-l : {a : M} {b : M}
     → a ≤M b
     → {c : M}
     → (c ⊗M a) ≤M (c ⊗M b)          
-  compatM-l (Mk≤M p) = Mk≤M (compat-l (oncMonoid bp-pf) p)
+  compatM-l p = compat-l (oncMonoid bp-pf) p
   
   unitM = unit (oncMonoid bp-pf)
+
+  {-# DISPLAY unit = unitM  #-}
   
   left-identM : {a : M} → unitM ⊗M a ≡ a
   left-identM = left-ident (oncMonoid bp-pf)
@@ -67,18 +70,18 @@ module NCDialSets-local-defs where
   l-adjM : {a b y : M}
     → (a ⊗M y) ≤M b
     → y ≤M (a ⇀M b)
-  l-adjM (Mk≤M p) = Mk≤M (l-adj bp-pf p)
+  l-adjM p = l-adj bp-pf p
 
   r-adjM : {a b y : M}
     → (y ⊗M a) ≤M b
     → y ≤M (b ↼M a)
-  r-adjM (Mk≤M p) = Mk≤M (r-adj bp-pf p)
+  r-adjM p = r-adj bp-pf p
 
   l-rlcompM : (a b : M) → (a ⊗M (a ⇀M b)) ≤M b
-  l-rlcompM a b = Mk≤M (l-rlcomp bp-pf a b)
+  l-rlcompM a b = l-rlcomp bp-pf a b
 
   r-rlcompM : (a b : M) → ((b ↼M a) ⊗M a) ≤M b
-  r-rlcompM a b = Mk≤M (r-rlcomp bp-pf a b)
+  r-rlcompM a b = r-rlcomp bp-pf a b
 
 open NCDialSets-local-defs
   
@@ -97,7 +100,7 @@ obj-snd : Obj → Set ℓ
 obj-snd (U , X , α) = X
   
 -- The morphisms:
-Hom : Obj → Obj → Set (lsuc lzero ⊔ ℓ)
+Hom : Obj → Obj → Set ℓ
 Hom (U , X , α) (V , Y , β) =
   Σ[ f ∈ (U → V) ]
     (Σ[ F ∈ (Y → X) ] (∀{u : U}{y : Y} → α u (F y) ≤M β (f u) y))
@@ -189,7 +192,7 @@ _⊗ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
  where
   cond : {u : Σ U (λ x → V)} {y : Σ (S → Z) (λ x → W → T)} →
       ((α ⊗ᵣ β) u (F⊗ {f = f}{F}{g}{G} y)) ≤M ((γ ⊗ᵣ δ) (⟨ f , g ⟩ u) y)
-  cond {u , v}{h , j} = Mk≤M (bp-mul-funct {p = oncMonoid bp-pf} (≤M-pf (p₁ {u}{h (g v)})) (≤M-pf (p₂ {v}{j (f u)})))
+  cond {u , v}{h , j} = bp-mul-funct {p = oncMonoid bp-pf} (p₁ {u}{h (g v)}) (p₂ {v}{j (f u)})
 
 -- The unit for tensor:
 ι : ⊤ {ℓ} → ⊤ {ℓ} → M
@@ -315,7 +318,7 @@ _⇀ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
    H (w , t) = f w , G t
    cond : {u : Σ (U → V) (λ x → Y → X)} {y : Σ W (λ x → T)} →
         (⇀-cond α β u (H y)) ≤M (⇀-cond γ δ (h u) y)
-   cond {t₁ , t₂}{w , t} = Mk≤M (l-imp-funct {p = bp-pf} (≤M-pf p₁) (≤M-pf p₂))
+   cond {t₁ , t₂}{w , t} = l-imp-funct {p = bp-pf} p₁ p₂
 
 ⇀-cur : {A B C : Obj}
   → Hom (B ⊗ₒ A) C
@@ -389,7 +392,7 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
    H : Σ W (λ x → T) → Σ U (λ x → Y)
    H (w , t) = f w , G t
    cond : {u : (U → V) × (Y → X)} {y : W × T} → ↼-cond α β u (H y) ≤M ↼-cond γ δ (h u) y
-   cond {t₁ , t₂}{w , t} = Mk≤M (r-imp-funct {p = bp-pf} (≤M-pf p₁) (≤M-pf p₂))
+   cond {t₁ , t₂}{w , t} = r-imp-funct {p = bp-pf} p₁ p₂
 
 ↼-cur : {A B C : Obj}
   → Hom (A ⊗ₒ B) C
@@ -485,7 +488,7 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
          (foldr (λ a y → (β (f u) a) ⊗M y) unitM l)
        aux {[]} = reflM
        aux {y :: ys} with aux {ys}
-       ... | IH = Mk≤M (bp-mul-funct {p = oncMonoid bp-pf} (≤M-pf (p {u}{y})) (≤M-pf IH))
+       ... | IH = bp-mul-funct {p = oncMonoid bp-pf} (p {u}{y}) IH
 
 -- The unit of the comonad:
 ε : ∀{A} → Hom (!ₒ A) A
