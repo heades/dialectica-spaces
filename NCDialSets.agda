@@ -64,8 +64,12 @@ module NCDialSets-local-defs where
   _⇀M_ : M → M → M
   _⇀M_ = l-imp bp-pf
 
+  {-# DISPLAY l-imp = _⇀M_  #-}
+
   _↼M_ : M → M → M
   _↼M_ = r-imp bp-pf
+
+  {-# DISPLAY r-imp = _↼M_  #-}
   
   l-adjM : {a b y : M}
     → (a ⊗M y) ≤M b
