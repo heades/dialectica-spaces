@@ -1,3 +1,4 @@
+
 --------------------------------------------------------------------------------------------
 -- The definition of the non-commutative dialectica category GC on Sets                   --
 -- parameterized by an arbitrary bi-closed poset.  GC is described in                     --
@@ -18,29 +19,32 @@ module NCDialSets-local-defs where
   -----------------------------------------------------------------------
   -- Initial local definitions to make reading types easier            --
   -----------------------------------------------------------------------
-  _≤M_ : M → M → Set
-  _≤M_ = (rel (poset (oncMonoid bp-pf)))
-
+  record _≤M_ (a : M)(b : M) : Set₁ where
+    constructor Mk≤M
+    field
+      ≤M-pf : (rel (poset (oncMonoid bp-pf))) a b
+  open _≤M_ public
+  
   _⊗M_ : M → M → M
   _⊗M_ = mul (oncMonoid bp-pf)
 
   reflM : {a : M} → a ≤M a
-  reflM = prefl (poset (oncMonoid bp-pf))
+  reflM {a} = Mk≤M (prefl (poset (oncMonoid bp-pf)))
   
   transM : {a b c : M} → a ≤M b → b ≤M c → a ≤M c
-  transM = ptrans (poset (oncMonoid bp-pf))
+  transM (Mk≤M p₁) (Mk≤M p₂) = Mk≤M ((ptrans (poset (oncMonoid bp-pf))) p₁ p₂)
   
   compatM-r : {a : M} {b : M}
     → a ≤M b
     → {c : M}
     → (a ⊗M c) ≤M (b ⊗M c)          
-  compatM-r = compat-r (oncMonoid bp-pf)
+  compatM-r (Mk≤M p) = Mk≤M (compat-r (oncMonoid bp-pf) p)
 
   compatM-l : {a : M} {b : M}
     → a ≤M b
     → {c : M}
     → (c ⊗M a) ≤M (c ⊗M b)          
-  compatM-l = compat-l (oncMonoid bp-pf)    
+  compatM-l (Mk≤M p) = Mk≤M (compat-l (oncMonoid bp-pf) p)
   
   unitM = unit (oncMonoid bp-pf)
   
@@ -61,21 +65,23 @@ module NCDialSets-local-defs where
   _↼M_ = r-imp bp-pf
   
   l-adjM : {a b y : M}
-    → (a ⊗M y) ≤M b → y ≤M (a ⇀M b)
-  l-adjM = l-adj bp-pf
+    → (a ⊗M y) ≤M b
+    → y ≤M (a ⇀M b)
+  l-adjM (Mk≤M p) = Mk≤M (l-adj bp-pf p)
 
   r-adjM : {a b y : M}
-    → (y ⊗M a) ≤M b → y ≤M (b ↼M a)
-  r-adjM = r-adj bp-pf
+    → (y ⊗M a) ≤M b
+    → y ≤M (b ↼M a)
+  r-adjM (Mk≤M p) = Mk≤M (r-adj bp-pf p)
 
   l-rlcompM : (a b : M) → (a ⊗M (a ⇀M b)) ≤M b
-  l-rlcompM = l-rlcomp bp-pf
+  l-rlcompM a b = Mk≤M (l-rlcomp bp-pf a b)
 
   r-rlcompM : (a b : M) → ((b ↼M a) ⊗M a) ≤M b
-  r-rlcompM = r-rlcomp bp-pf
+  r-rlcompM a b = Mk≤M (r-rlcomp bp-pf a b)
 
 open NCDialSets-local-defs
-
+  
 -----------------------------------------------------------------------
 -- We have a category                                                --
 -----------------------------------------------------------------------
@@ -91,7 +97,7 @@ obj-snd : Obj → Set ℓ
 obj-snd (U , X , α) = X
   
 -- The morphisms:
-Hom : Obj → Obj → Set ℓ
+Hom : Obj → Obj → Set (lsuc lzero ⊔ ℓ)
 Hom (U , X , α) (V , Y , β) =
   Σ[ f ∈ (U → V) ]
     (Σ[ F ∈ (Y → X) ] (∀{u : U}{y : Y} → α u (F y) ≤M β (f u) y))
@@ -115,7 +121,6 @@ Homₐ f h g = comp f (comp g h)
 -- The identity function:
 id : {A : Obj} → Hom A A 
 id {(U , V , α)} = (id-set , id-set , reflM)
-
 
 -- In this formalization we will only worry about proving that the
 -- data of morphisms are equivalent, and not worry about the morphism
@@ -176,7 +181,6 @@ _⊗ᵣ_ α β (u , v) (f , g) = (α u (f v)) ⊗M (β v (g u))
 _⊗ₒ_ : (A B : Obj) → Obj
 (U , X , α) ⊗ₒ (V , Y , β) = ((U × V) , ((V → X) × (U → Y)) , α ⊗ᵣ β)
 
-
 F⊗ : ∀{S Z W T V X U Y : Set ℓ}{f : U → W}{F : Z → X}{g : V → S}{G : T → Y} → (S → Z) × (W → T) → (V → X) × (U → Y)
 F⊗ {f = f}{F}{g}{G} (h₁ , h₂) = (λ v → F(h₁ (g v))) , (λ u → G(h₂ (f u)))
   
@@ -185,7 +189,7 @@ _⊗ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
  where
   cond : {u : Σ U (λ x → V)} {y : Σ (S → Z) (λ x → W → T)} →
       ((α ⊗ᵣ β) u (F⊗ {f = f}{F}{g}{G} y)) ≤M ((γ ⊗ᵣ δ) (⟨ f , g ⟩ u) y)
-  cond {u , v}{h , j} = bp-mul-funct {p = oncMonoid bp-pf} (p₁ {u}{h (g v)}) (p₂ {v}{j (f u)}) 
+  cond {u , v}{h , j} = Mk≤M (bp-mul-funct {p = oncMonoid bp-pf} (≤M-pf (p₁ {u}{h (g v)})) (≤M-pf (p₂ {v}{j (f u)})))
 
 -- The unit for tensor:
 ι : ⊤ {ℓ} → ⊤ {ℓ} → M
@@ -249,7 +253,6 @@ Fα : ∀{V W X Y U V Z : Set ℓ} → Σ (Σ V (λ x → W) → X) (λ x → U 
        → Σ (W → Σ (V → X) (λ x → U → Y)) (λ x → Σ U (λ x₁ → V) → Z)
 Fα (f ,  g) = (λ x → (λ x₁ → f ((x₁ , x))) , (λ x₁ → fst (g x₁) x)) , (λ x → snd (g (fst x)) (snd x))
 
-
 α⊗ : ∀{A B C : Obj} → Hom ((A ⊗ₒ B) ⊗ₒ C) (A ⊗ₒ (B ⊗ₒ C)) 
 α⊗ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)} = (lr-assoc-× , Fα {V} , (λ {u y} → cond {u}{y}))
  where
@@ -258,7 +261,6 @@ Fα (f ,  g) = (λ x → (λ x₁ → f ((x₁ , x))) , (λ x₁ → fst (g x₁
       (((α ⊗ᵣ β) ⊗ᵣ γ) u (Fα {V} y)) ≤M ((α ⊗ᵣ (β ⊗ᵣ γ)) (lr-assoc-× u) y)
   cond {(u , v) , w}{t₁ , t₂} with t₂ u
   ... | t₃ , t₄ rewrite sym (assocM {(α u (t₁ (v , w)))}{(β v (t₃ w))}{(γ w (t₄ v))}) = reflM
-
 
 α⊗-id₁ : ∀{A B C} → (α⊗ {A}{B}{C}) ○ α⁼¹⊗ ≡h id
 α⊗-id₁ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux , ext-set aux'
@@ -295,7 +297,6 @@ Fα (f ,  g) = (λ x → (λ x₁ → f ((x₁ , x))) , (λ x₁ → fst (g x₁
        aux''' {u} with j₂ u
        ... | h₁ , h₂ = refl
 
-
 -- Internal homs:
 
 ⇀-cond : ∀{U V X Y : Set ℓ} → (U → X → M) → (V → Y → M) → (U → V) × (Y → X) → U × Y → M
@@ -314,7 +315,7 @@ _⇀ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
    H (w , t) = f w , G t
    cond : {u : Σ (U → V) (λ x → Y → X)} {y : Σ W (λ x → T)} →
         (⇀-cond α β u (H y)) ≤M (⇀-cond γ δ (h u) y)
-   cond {t₁ , t₂}{w , t} = l-imp-funct {p = bp-pf} p₁ p₂
+   cond {t₁ , t₂}{w , t} = Mk≤M (l-imp-funct {p = bp-pf} (≤M-pf p₁) (≤M-pf p₂))
 
 ⇀-cur : {A B C : Obj}
   → Hom (B ⊗ₒ A) C
@@ -328,7 +329,6 @@ _⇀ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
    cond {u}{v , z} with p₁ {v , u}{z}
    ... | p₂ with F z
    ... | t₁ , t₂ = l-adjM p₂
-
 
 ⇀-cur-≡h : ∀{A B C}{f₁ f₂ : Hom (A ⊗ₒ B) C}
   → f₁ ≡h f₂
@@ -389,7 +389,7 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
    H : Σ W (λ x → T) → Σ U (λ x → Y)
    H (w , t) = f w , G t
    cond : {u : (U → V) × (Y → X)} {y : W × T} → ↼-cond α β u (H y) ≤M ↼-cond γ δ (h u) y
-   cond {t₁ , t₂}{w , t} = r-imp-funct {p = bp-pf} p₁ p₂
+   cond {t₁ , t₂}{w , t} = Mk≤M (r-imp-funct {p = bp-pf} (≤M-pf p₁) (≤M-pf p₂))
 
 ↼-cur : {A B C : Obj}
   → Hom (A ⊗ₒ B) C
@@ -462,7 +462,6 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
 !ₒ : Obj → Obj
 !ₒ (U , X , α) = U , (U → X *) , !ₒ-cond α
 
-
 !-cta : {V Y U X : Set ℓ}
   → (Y → X)
   → (U → V)
@@ -486,7 +485,7 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
          (foldr (λ a y → (β (f u) a) ⊗M y) unitM l)
        aux {[]} = reflM
        aux {y :: ys} with aux {ys}
-       ... | IH = bp-mul-funct {p = oncMonoid bp-pf} (p {u}{y}) IH
+       ... | IH = Mk≤M (bp-mul-funct {p = oncMonoid bp-pf} (≤M-pf (p {u}{y})) (≤M-pf IH))
 
 -- The unit of the comonad:
 ε : ∀{A} → Hom (!ₒ A) A
@@ -516,16 +515,12 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
        unitM (y u))
    cond {u}{t} = aux {t u}
     where
-     aux : {l : 𝕃 (U → 𝕃 X)} → rel (poset (oncMonoid bp-pf))
-      (foldr (λ a y → mul (oncMonoid bp-pf) (α u a) y) (unit (oncMonoid bp-pf))
-       (foldr (λ f → _++_ (f u)) [] l))
-      (foldr
-       (λ a y →
-          mul (oncMonoid bp-pf)
-          (foldr (λ a₁ y₁ → mul (oncMonoid bp-pf) (α u a₁) y₁)
-           (unit (oncMonoid bp-pf)) (a u))
-          y)
-       (unit (oncMonoid bp-pf)) l)      
+     aux : {l : 𝕃 (U → 𝕃 X)} →
+         (foldr (λ a y → (α u a) ⊗M y) unitM (foldr (λ f → _++_ (f u)) [] l))
+       ≤M
+         (foldr
+           (λ a y → (foldr (λ a₁ y₁ → (α u a₁) ⊗M y₁) unitM (a u)) ⊗M y)
+           unitM l)
      aux {[]} = reflM
      aux {t₁ :: ts} with aux {ts}
      ... | IH with t₁ u
@@ -535,8 +530,8 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
         ts)} = IH
      ... | x :: xs rewrite
            sym (foldr-monoid {l₁ = xs}{foldr (λ f → _++_ (f u)) [] ts}{_⊗M_}{α u}{unitM}{left-identM}{assocM})
-         | assocM {(α u x)}{(foldr (λ x₁ → mul (oncMonoid bp-pf) (α u x₁)) (unit (oncMonoid bp-pf)) xs)}{(foldr (λ x₁ → mul (oncMonoid bp-pf) (α u x₁)) (unit (oncMonoid bp-pf)) (foldr (λ f → _++_ (f u)) [] ts))}
-      = {!!}
+         | assocM {(α u x)}{(foldr (λ x₁ → _⊗M_ (α u x₁)) unitM xs)}{(foldr (λ x₁ → _⊗M_ (α u x₁)) unitM (foldr (λ f → _++_ (f u)) [] ts))}
+      = compatM-l IH {((α u x) ⊗M (foldr (λ x₁ → _⊗M_ (α u x₁)) unitM xs))}
 
 -- The proper diagrams:
 comonand-diag₁ : ∀{A}
