@@ -1,4 +1,3 @@
-
 --------------------------------------------------------------------------------------------
 -- The definition of the non-commutative dialectica category GC on Sets                   --
 -- parameterized by an arbitrary bi-closed poset.  GC is described in                     --
