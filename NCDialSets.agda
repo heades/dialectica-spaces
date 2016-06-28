@@ -69,7 +69,27 @@ module NCDialSets-local-defs where
   _↼M_ = r-imp bp-pf
 
   {-# DISPLAY r-imp = _↼M_  #-}
-  
+
+  βM : M → M
+  βM = exc bp-pf
+
+  {-# DISPLAY exc = βM  #-}
+
+  βM-compat : {a b : M} → a ≤M b → (βM a) ≤M (βM b)
+  βM-compat = exc-compat bp-pf
+
+  βM-min : {a : M} → (βM a) ≤M a
+  βM-min = exc-min bp-pf
+
+  βM-dup : {a : M} → (βM a) ≤M (βM (βM a))
+  βM-dup = exc-dup bp-pf
+
+  βM-sym-left : {a b : M} → ((βM a) ⊗M b) ≤M (b ⊗M (βM a))
+  βM-sym-left = exc-sym-left bp-pf
+
+  βM-sym-right : {a b : M} → (a ⊗M (βM b)) ≤M ((βM b) ⊗M a)
+  βM-sym-right = exc-sym-right bp-pf
+
   l-adjM : {a b y : M}
     → (a ⊗M y) ≤M b
     → y ≤M (a ⇀M b)
@@ -455,7 +475,50 @@ _↼ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁)
    aux₂ {v , z} = refl
 
 -----------------------------------------------------------------------
--- The of-course exponential                                         --
+-- The exchange modality                                             --
+-----------------------------------------------------------------------
+
+κₒ : Obj → Obj
+κₒ (U , X , α) = U , X , (λ u x → βM (α u x))
+
+κₐ : {A B : Obj} → Hom A B → Hom (κₒ A) (κₒ B)
+κₐ {U , X , α}{V , Y , β} (f , F , p) = f , F , βM-compat p
+
+κε : ∀{A} → Hom (κₒ A) A
+κε {U , X , α} = id-set , id-set , βM-min
+
+κδ : ∀{A} → Hom (κₒ A) (κₒ (κₒ A))
+κδ {U , X , α} = id-set , id-set , βM-dup
+
+-- The proper diagrams:
+κ-comonand-diag₁ : ∀{A}
+  → (κδ {A}) ○ (κₐ (κδ {A})) ≡h (κδ {A}) ○ (κδ { κₒ A})
+κ-comonand-diag₁ {U , X , α} = refl , refl
+
+κ-comonand-diag₂ : ∀{A}
+  → (κδ {A}) ○ (κε { κₒ A}) ≡h (κδ {A}) ○ (κₐ (κε {A}))
+κ-comonand-diag₂ {U , X , α} = refl , refl
+
+-- Symmetries:
+
+β-left : ∀{A B} → Hom ((κₒ A) ⊗ₒ B) (B ⊗ₒ (κₒ A))
+β-left {U , X , α}{V , Y , β} = twist-× , twist-× , (λ {u} {y} → aux {u}{y})
+ where
+  aux : {u : U × V} {y : (U → Y) × (V → X)} →
+      ((λ u₁ x → βM (α u₁ x)) ⊗ᵣ β) u (twist-× y) ≤M
+      (β ⊗ᵣ (λ u₁ x → βM (α u₁ x))) (twist-× u) y
+  aux {u , v}{f , g} = βM-sym-left
+
+β-right : ∀{A B} → Hom (A ⊗ₒ (κₒ B)) ((κₒ B) ⊗ₒ A)
+β-right {U , X , α}{V , Y , β} = twist-× , twist-× , (λ {u} {y} → aux {u}{y})
+ where
+  aux : {u : U × V} {y : (U → Y) × (V → X)} →
+      (α ⊗ᵣ (λ u₁ x → βM (β u₁ x))) u (twist-× y) ≤M
+      ((λ u₁ x → βM (β u₁ x)) ⊗ᵣ α) (twist-× u) y
+  aux {u , v}{f , g} = βM-sym-right
+
+-----------------------------------------------------------------------
+-- The of-course modality                                            --
 -----------------------------------------------------------------------
 
 !ₒ-cond : ∀{U X : Set ℓ}

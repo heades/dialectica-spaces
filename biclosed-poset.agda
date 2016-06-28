@@ -38,7 +38,16 @@ record BiclosedPoset {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
    oncMonoid : ONCMonoid L
    l-imp : L → L → L -- a ⇀ b = l-imp a b
    r-imp : L → L → L -- b ↼ a = r-imp b a
-   
+   exc : L → L
+
+   -- Axioms for exchange:
+   exc-compat : {a b : L} → (rel (poset oncMonoid)) a b → (rel (poset oncMonoid)) (exc a) (exc b)
+   exc-min : {a : L} → (rel (poset oncMonoid)) (exc a) a
+   exc-dup : {a : L} → (rel (poset oncMonoid)) (exc a) (exc (exc a))
+   exc-sym-left : {a b : L} → (rel (poset oncMonoid)) ((mul oncMonoid) (exc a) b) ((mul oncMonoid)b (exc a))
+   exc-sym-right : {a b : L} → (rel (poset oncMonoid)) ((mul oncMonoid) a (exc b)) ((mul oncMonoid) (exc b) a)    
+
+   -- Axioms for implications:
    l-rlcomp : (a b : L) → (rel (poset oncMonoid)) ((mul oncMonoid) a (l-imp a b)) b
    l-adj : {a b y : L} → (rel (poset oncMonoid)) (mul oncMonoid a y) b → (rel (poset oncMonoid)) y (l-imp a b)
 
