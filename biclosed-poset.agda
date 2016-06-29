@@ -36,8 +36,8 @@ record BiclosedPoset {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
  constructor MkBiclosedPoset
  field
    oncMonoid : ONCMonoid L
-   l-imp : L → L → L -- a ⇀ b = l-imp a b
-   r-imp : L → L → L -- b ↼ a = r-imp b a
+   r-imp : L → L → L -- a ⇀ b = r-imp a b
+   l-imp : L → L → L -- b ↼ a = l-imp b a
    exc : L → L
 
    -- Axioms for exchange:
@@ -48,10 +48,10 @@ record BiclosedPoset {ℓ : Level}(L : Set ℓ) : Set (lsuc ℓ) where
    exc-sym-right : {a b : L} → (rel (poset oncMonoid)) ((mul oncMonoid) a (exc b)) ((mul oncMonoid) (exc b) a)    
 
    -- Axioms for implications:
-   l-rlcomp : (a b : L) → (rel (poset oncMonoid)) ((mul oncMonoid) a (l-imp a b)) b
-   l-adj : {a b y : L} → (rel (poset oncMonoid)) (mul oncMonoid a y) b → (rel (poset oncMonoid)) y (l-imp a b)
+   r-rlcomp : (a b : L) → (rel (poset oncMonoid)) ((mul oncMonoid) a (r-imp a b)) b
+   r-adj : {a b y : L} → (rel (poset oncMonoid)) (mul oncMonoid a y) b → (rel (poset oncMonoid)) y (r-imp a b)
 
-   r-rlcomp : (a b : L) → (rel (poset oncMonoid)) ((mul oncMonoid) (r-imp b a) a) b
-   r-adj : {a b y : L} → (rel (poset oncMonoid)) (mul oncMonoid y a) b → (rel (poset oncMonoid)) y (r-imp b a)
+   l-rlcomp : (a b : L) → (rel (poset oncMonoid)) ((mul oncMonoid) (l-imp b a) a) b
+   l-adj : {a b y : L} → (rel (poset oncMonoid)) (mul oncMonoid y a) b → (rel (poset oncMonoid)) y (l-imp b a)
 
 open BiclosedPoset public

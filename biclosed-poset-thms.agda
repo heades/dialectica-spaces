@@ -14,20 +14,20 @@ bp-mul-funct {_}{P}{MkONCMonoid _⊗_ ut (MkPoset _≤_ r t n) asc li ri cp-l cp
 l-imp-funct : ∀{ℓ}{L : Set ℓ}{p : BiclosedPoset L}{c a b d : L}
   → (rel (poset (oncMonoid p))) c a
   → (rel (poset (oncMonoid p))) b d
-  → (rel (poset (oncMonoid p))) (l-imp p a b) (l-imp p c d)
+  → (rel (poset (oncMonoid p))) (r-imp p a b) (r-imp p c d)
 l-imp-funct {p = MkBiclosedPoset
             (MkONCMonoid _⊗_ I
             (MkPoset _≤_ prefl ptrans pasymm) assoc left-ident right-ident compat-l compat-r)
-            _⇀_ _↼_ _ _ _ _ _ _ l-rlcomp l-adj r-rlcomp r-adj}{c}{a}{b}{d} p₁ p₂
+            _⇀_ _↼_ _ _ _ _ _ _ r-rlcomp r-adj l-rlcomp l-adj}{c}{a}{b}{d} p₁ p₂
   = let x = compat-r p₁ {a ⇀ b}
-        y = ptrans x (l-rlcomp a b)
+        y = ptrans x (r-rlcomp a b)
         z = ptrans y p₂
-     in l-adj z
+     in r-adj z
 
 r-imp-funct : ∀{ℓ}{L : Set ℓ}{p : BiclosedPoset L}{c a b d : L}
   → (rel (poset (oncMonoid p))) c a
   → (rel (poset (oncMonoid p))) b d
-  → (rel (poset (oncMonoid p))) (r-imp p b a) (r-imp p d c)
+  → (rel (poset (oncMonoid p))) (l-imp p b a) (l-imp p d c)
 r-imp-funct {p = MkBiclosedPoset
             (MkONCMonoid _⊗_ I
             (MkPoset _≤_ prefl ptrans pasymm) assoc left-ident right-ident compat-l compat-r)

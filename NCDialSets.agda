@@ -61,14 +61,14 @@ module NCDialSets-local-defs where
   assocM = assoc (oncMonoid bp-pf)
   
   _⇀M_ : M → M → M
-  _⇀M_ = l-imp bp-pf
+  _⇀M_ = r-imp bp-pf
 
-  {-# DISPLAY l-imp = _⇀M_  #-}
+  {-# DISPLAY r-imp = _⇀M_  #-}
 
   _↼M_ : M → M → M
-  _↼M_ = r-imp bp-pf
+  _↼M_ = l-imp bp-pf
 
-  {-# DISPLAY r-imp = _↼M_  #-}
+  {-# DISPLAY l-imp = _↼M_  #-}
 
   βM : M → M
   βM = exc bp-pf
@@ -93,18 +93,18 @@ module NCDialSets-local-defs where
   l-adjM : {a b y : M}
     → (a ⊗M y) ≤M b
     → y ≤M (a ⇀M b)
-  l-adjM p = l-adj bp-pf p
+  l-adjM p = r-adj bp-pf p
 
   r-adjM : {a b y : M}
     → (y ⊗M a) ≤M b
     → y ≤M (b ↼M a)
-  r-adjM p = r-adj bp-pf p
+  r-adjM p = l-adj bp-pf p
 
   l-rlcompM : (a b : M) → (a ⊗M (a ⇀M b)) ≤M b
-  l-rlcompM a b = l-rlcomp bp-pf a b
+  l-rlcompM a b = r-rlcomp bp-pf a b
 
   r-rlcompM : (a b : M) → ((b ↼M a) ⊗M a) ≤M b
-  r-rlcompM a b = r-rlcomp bp-pf a b
+  r-rlcompM a b = l-rlcomp bp-pf a b
 
 open NCDialSets-local-defs
   
