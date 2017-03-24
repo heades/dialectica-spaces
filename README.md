@@ -14,15 +14,19 @@ poset-reflection of the notion of a monoidal closed category).
 - Lineales are defined in [lineale.agda](lineale.agda)
 - Theorems about lineales can be found in [lineale-thms.agda](lineale-thms.agda)
 - Definitions of concrete lineales can be found in [concrete-lineales.agda](concrete-lineales.agda)
+- Colineales are defined in [colineale.agda](colineale.agda)
+- Theorems about colineales can be found in [colineale-thms.agda](colineale-thms.agda)
+- Definitions of concrete colineales can be found in [concrete-colineales.agda](concrete-colineales.agda)
 
-Finally, we have the two types of dialectica spaces:
+Finally, we have the three types of dialectica spaces:
 
 - DC over sets can be found in [DCSets.agda](DCSets.agda)
 - Dial over sets can be found in [DialSets.agda](DialSets.agda)
+- Non-commutative dial over sets can be found in [NCDialSets.agda](NCDialSets.agda)
 
 Concurrency operators defined in DialSets instantiated to the three
 element concrete lineale can be found in
 [concurrency.agda](concurrency.agda).
 
-This formalization was developed and tested with Agda 2.5.1 and
+This formalization was developed and tested with Agda 2.5.2 and
 depends on the [Augusta University Agda Library](https://github.com/heades/AUGL). 
