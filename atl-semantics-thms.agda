@@ -53,16 +53,6 @@ assoc₃ {one} {one} {zero} = refl
 assoc₃ {one} {one} {half} = refl
 assoc₃ {one} {one} {one} = refl
 
--- left-ident₃ : {a : Three} → half ⊙₃ a ≡ a
--- left-ident₃ {zero} = refl
--- left-ident₃ {half} = refl
--- left-ident₃ {one} = refl
-
--- right-ident₃ : {a : Three} → a ⊙₃ half ≡ a
--- right-ident₃ {zero} = refl
--- right-ident₃ {half} = refl
--- right-ident₃ {one} = refl
-
 comp₃ : {a b : Three} → a ≤₃ b → {c : Three} → (a ⊙₃ c) ≤₃ (b ⊙₃ c)
 comp₃ {zero} {zero} x {zero} = triv
 comp₃ {zero} {zero} x {half} = triv
@@ -237,9 +227,6 @@ lchoice-contract : ∀{a} → (a ⊔₃ a) ≡ a
 lchoice-contract {zero} = refl
 lchoice-contract {half} = refl
 lchoice-contract {one} = refl
-
--- Fails:
--- lchoice-u : ∀{x a b} → x ≤₃ a → x ≤₃ b → x ≤₃ lchoice a b
 
 lchoice-prod1 : ∀{a b} → a ⊔₃ b ≤₃ a
 lchoice-prod1 {zero} {zero} = triv
@@ -477,35 +464,6 @@ adj₃ {one} {one} {zero} p = triv
 adj₃ {one} {one} {half} p = triv
 adj₃ {one} {one} {one} p = triv
 
--- adj₃-inv : {a b y : Three} → y ≤₃ (a ⊸₃ b) → (a ⊙₃ y) ≤₃ b
--- adj₃-inv {zero} {zero} {zero} p = triv
--- adj₃-inv {zero} {zero} {half} p = triv
--- adj₃-inv {zero} {zero} {one} p = triv
--- adj₃-inv {zero} {half} {zero} p = triv
--- adj₃-inv {zero} {half} {half} p = triv
--- adj₃-inv {zero} {half} {one} p = triv
--- adj₃-inv {zero} {one} {zero} p = triv
--- adj₃-inv {zero} {one} {half} p = triv
--- adj₃-inv {zero} {one} {one} p = triv
--- adj₃-inv {half} {zero} {zero} p = triv
--- adj₃-inv {half} {zero} {half} p = p
--- adj₃-inv {half} {zero} {one} p = p
--- adj₃-inv {half} {half} {zero} p = triv
--- adj₃-inv {half} {half} {half} p = triv
--- adj₃-inv {half} {half} {one} p = p
--- adj₃-inv {half} {one} {zero} p = triv
--- adj₃-inv {half} {one} {half} p = triv
--- adj₃-inv {half} {one} {one} p = triv
--- adj₃-inv {one} {zero} {zero} p = triv
--- adj₃-inv {one} {zero} {half} p = p
--- adj₃-inv {one} {zero} {one} p = p
--- adj₃-inv {one} {half} {zero} p = triv
--- adj₃-inv {one} {half} {half} p = p
--- adj₃-inv {one} {half} {one} p = p
--- adj₃-inv {one} {one} {zero} p = triv
--- adj₃-inv {one} {one} {half} p = triv
--- adj₃-inv {one} {one} {one} p = triv
-
 l-adj₃ : {a b y : Three} → (a ▷₃ y) ≤₃ b → y ≤₃ (b ↼₃ a)
 l-adj₃ {zero} {zero} {zero} p = triv
 l-adj₃ {zero} {zero} {half} p = triv
@@ -535,35 +493,6 @@ l-adj₃ {one} {one} {zero} p = triv
 l-adj₃ {one} {one} {half} p = triv
 l-adj₃ {one} {one} {one} p = triv
 
--- l-adj₃-inv : {a b y : Three} → y ≤₃ (b ↼₃ a) → (a ▷₃ y) ≤₃ b
--- l-adj₃-inv {zero} {zero} {zero} p = triv
--- l-adj₃-inv {zero} {zero} {half} p = triv
--- l-adj₃-inv {zero} {zero} {one} p = triv
--- l-adj₃-inv {zero} {half} {zero} p = triv
--- l-adj₃-inv {zero} {half} {half} p = triv
--- l-adj₃-inv {zero} {half} {one} p = triv
--- l-adj₃-inv {zero} {one} {zero} p = triv
--- l-adj₃-inv {zero} {one} {half} p = triv
--- l-adj₃-inv {zero} {one} {one} p = triv
--- l-adj₃-inv {half} {zero} {zero} p = triv
--- l-adj₃-inv {half} {zero} {half} p = p
--- l-adj₃-inv {half} {zero} {one} p = p
--- l-adj₃-inv {half} {half} {zero} p = triv
--- l-adj₃-inv {half} {half} {half} p = triv
--- l-adj₃-inv {half} {half} {one} p = p
--- l-adj₃-inv {half} {one} {zero} p = triv
--- l-adj₃-inv {half} {one} {half} p = triv
--- l-adj₃-inv {half} {one} {one} p = triv
--- l-adj₃-inv {one} {zero} {zero} p = triv
--- l-adj₃-inv {one} {zero} {half} p = p 
--- l-adj₃-inv {one} {zero} {one} p = p
--- l-adj₃-inv {one} {half} {zero} p = triv
--- l-adj₃-inv {one} {half} {half} p = triv
--- l-adj₃-inv {one} {half} {one} p = p
--- l-adj₃-inv {one} {one} {zero} p = triv
--- l-adj₃-inv {one} {one} {half} p = triv
--- l-adj₃-inv {one} {one} {one} p = triv
-
 r-adj₃ : {a b y : Three} → (y ▷₃ a) ≤₃ b → y ≤₃ (a ⇀₃ b)
 r-adj₃ {zero} {zero} {zero} p = triv
 r-adj₃ {zero} {zero} {half} p = triv
@@ -592,32 +521,3 @@ r-adj₃ {one} {half} {one} p = p
 r-adj₃ {one} {one} {zero} p = triv
 r-adj₃ {one} {one} {half} p = triv
 r-adj₃ {one} {one} {one} p = triv
-
--- r-adj₃-inv : {a b y : Three} → y ≤₃ (a ⇀₃ b) → (y ▷₃ a) ≤₃ b
--- r-adj₃-inv {zero} {zero} {zero} p = triv
--- r-adj₃-inv {zero} {zero} {half} p = triv
--- r-adj₃-inv {zero} {zero} {one} p = triv
--- r-adj₃-inv {zero} {half} {zero} p = triv
--- r-adj₃-inv {zero} {half} {half} p = triv
--- r-adj₃-inv {zero} {half} {one} p = triv
--- r-adj₃-inv {zero} {one} {zero} p = triv
--- r-adj₃-inv {zero} {one} {half} p = triv
--- r-adj₃-inv {zero} {one} {one} p = triv
--- r-adj₃-inv {half} {zero} {zero} p = triv
--- r-adj₃-inv {half} {zero} {half} p = p
--- r-adj₃-inv {half} {zero} {one} p = p
--- r-adj₃-inv {half} {half} {zero} p = triv
--- r-adj₃-inv {half} {half} {half} p = triv
--- r-adj₃-inv {half} {half} {one} p = triv
--- r-adj₃-inv {half} {one} {zero} p = triv
--- r-adj₃-inv {half} {one} {half} p = triv
--- r-adj₃-inv {half} {one} {one} p = triv
--- r-adj₃-inv {one} {zero} {zero} p = triv
--- r-adj₃-inv {one} {zero} {half} p = p
--- r-adj₃-inv {one} {zero} {one} p = p
--- r-adj₃-inv {one} {half} {zero} p = triv
--- r-adj₃-inv {one} {half} {half} p = p
--- r-adj₃-inv {one} {half} {one} p = p
--- r-adj₃-inv {one} {one} {zero} p = triv
--- r-adj₃-inv {one} {one} {half} p = triv
--- r-adj₃-inv {one} {one} {one} p = triv

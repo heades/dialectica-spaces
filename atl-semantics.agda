@@ -26,31 +26,14 @@ _⊙₃_ : Three → Three → Three
 zero ⊙₃ zero = half
 zero ⊙₃ half = half
 half ⊙₃ zero = half
-zero ⊙₃ one = one
-one ⊙₃ zero = one
 half ⊙₃ half = half
-half ⊙₃ one = one
-one ⊙₃ half = one
-one ⊙₃ one = one
-
--- _⊙₃_ : Three → Three → Three
--- one ⊙₃ one = one
--- half ⊙₃ half = half
--- half ⊙₃ one = one
--- one ⊙₃ half = one
--- zero ⊙₃ zero = zero
--- _ ⊙₃ _ = zero
+_ ⊙₃ _ = one
 
 _▷₃_ : Three → Three → Three
-zero ▷₃ zero = half
-zero ▷₃ half = half
-half ▷₃ zero = half
 zero ▷₃ one = one
-one ▷₃ zero = half
-half ▷₃ half = half
 half ▷₃ one = one
-one ▷₃ half = half
 one ▷₃ one = one
+_ ▷₃ _ = half
 
 infix 4 _⊔₃_
 
@@ -83,14 +66,3 @@ one ⇀₃ zero = zero
 one ⇀₃ half = zero
 _ ⇀₃ _ = one
 
-record Three-Morphism : Set where
-  constructor TMor
-  field
-    func : Three → Three
-    monotone-pf : ∀{x y : Three} → x ≤₃ y → (func x) ≤₃ (func y)
-
-three-morph-comp : Three-Morphism → Three-Morphism → Three-Morphism
-three-morph-comp (TMor m₁ pm₁) (TMor m₂ pm₂) = TMor (m₂ ∘ m₁) pf
- where
-   pf : {x y : Three} → x ≤₃ y → (m₂ ∘ m₁) x ≤₃ (m₂ ∘ m₁) y
-   pf {x}{y} p = pm₂ (pm₁ p)
