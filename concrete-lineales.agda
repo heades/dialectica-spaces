@@ -646,15 +646,11 @@ isALineale3 = MkALineale isLineale3 add3 zero (λ {a b c} → aux₇ {a}{b}{c})
    aux₈ {one} {one} = refl
 
 land : Three → Three → Three
-land zero zero = zero
-land zero half = zero
-land zero one = zero
-land half zero = half
 land half half = half
-land half one = half
-land one zero = zero
+land half one = one
 land one half = half
 land one one = one
+land _ _ = zero
 
 land-assoc : {a b c : Three} → land a (land b c) ≡ land (land a b) c
 land-assoc {zero} {zero} {zero} = refl
@@ -685,16 +681,308 @@ land-assoc {one} {one} {zero} = refl
 land-assoc {one} {one} {half} = refl
 land-assoc {one} {one} {one} = refl
 
-land-proj₁ : {a b : Three} → land a b ≤3 a
-land-proj₁ {zero} {zero} = triv
-land-proj₁ {zero} {half} = triv
-land-proj₁ {zero} {one} = triv
-land-proj₁ {half} {zero} = triv
-land-proj₁ {half} {half} = triv
-land-proj₁ {half} {one} = triv
-land-proj₁ {one} {zero} = triv
-land-proj₁ {one} {half} = triv
-land-proj₁ {one} {one} = triv
+land-func : {a b c d : Three} → a ≤3 c → b ≤3 d → (land a b) ≤3 (land c d)
+land-func {zero} {zero} {zero} {zero} p1 p2 = triv
+land-func {zero} {zero} {zero} {half} p1 p2 = triv
+land-func {zero} {zero} {zero} {one} p1 p2 = triv
+land-func {zero} {zero} {half} {zero} p1 p2 = triv
+land-func {zero} {zero} {half} {half} p1 p2 = triv
+land-func {zero} {zero} {half} {one} p1 p2 = triv
+land-func {zero} {zero} {one} {zero} p1 p2 = triv
+land-func {zero} {zero} {one} {half} p1 p2 = triv
+land-func {zero} {zero} {one} {one} p1 p2 = triv
+land-func {zero} {half} {zero} {zero} p1 p2 = triv
+land-func {zero} {half} {zero} {half} p1 p2 = triv
+land-func {zero} {half} {zero} {one} p1 p2 = triv
+land-func {zero} {half} {half} {zero} p1 p2 = triv
+land-func {zero} {half} {half} {half} p1 p2 = triv
+land-func {zero} {half} {half} {one} p1 p2 = triv
+land-func {zero} {half} {one} {zero} p1 p2 = triv
+land-func {zero} {half} {one} {half} p1 p2 = triv
+land-func {zero} {half} {one} {one} p1 p2 = triv
+land-func {zero} {one} {zero} {zero} p1 p2 = triv
+land-func {zero} {one} {zero} {half} p1 p2 = triv
+land-func {zero} {one} {zero} {one} p1 p2 = triv
+land-func {zero} {one} {half} {zero} p1 p2 = triv
+land-func {zero} {one} {half} {half} p1 p2 = triv
+land-func {zero} {one} {half} {one} p1 p2 = triv
+land-func {zero} {one} {one} {zero} p1 p2 = triv
+land-func {zero} {one} {one} {half} p1 p2 = triv
+land-func {zero} {one} {one} {one} p1 p2 = triv
+land-func {half} {zero} {zero} {zero} p1 p2 = triv
+land-func {half} {zero} {zero} {half} p1 p2 = triv
+land-func {half} {zero} {zero} {one} p1 p2 = triv
+land-func {half} {zero} {half} {zero} p1 p2 = triv
+land-func {half} {zero} {half} {half} p1 p2 = triv
+land-func {half} {zero} {half} {one} p1 p2 = triv
+land-func {half} {zero} {one} {zero} p1 p2 = triv
+land-func {half} {zero} {one} {half} p1 p2 = triv
+land-func {half} {zero} {one} {one} p1 p2 = triv
+land-func {half} {half} {zero} {zero} p1 p2 = p1
+land-func {half} {half} {zero} {half} p1 p2 = p1
+land-func {half} {half} {zero} {one} p1 p2 = p1
+land-func {half} {half} {half} {zero} p1 ()
+land-func {half} {half} {half} {half} p1 p2 = triv
+land-func {half} {half} {half} {one} p1 p2 = triv
+land-func {half} {half} {one} {zero} p1 p2 = p2
+land-func {half} {half} {one} {half} p1 p2 = triv
+land-func {half} {half} {one} {one} p1 p2 = triv
+land-func {half} {one} {zero} {zero} p1 p2 = p1
+land-func {half} {one} {zero} {half} p1 p2 = p1
+land-func {half} {one} {zero} {one} p1 p2 = p1
+land-func {half} {one} {half} {zero} p1 p2 = p2
+land-func {half} {one} {half} {half} p1 p2 = p2
+land-func {half} {one} {half} {one} p1 p2 = triv
+land-func {half} {one} {one} {zero} p1 p2 = p2
+land-func {half} {one} {one} {half} p1 p2 = p2
+land-func {half} {one} {one} {one} p1 p2 = triv
+land-func {one} {zero} {zero} {zero} p1 p2 = triv
+land-func {one} {zero} {zero} {half} p1 p2 = triv
+land-func {one} {zero} {zero} {one} p1 p2 = triv
+land-func {one} {zero} {half} {zero} p1 p2 = triv
+land-func {one} {zero} {half} {half} p1 p2 = triv
+land-func {one} {zero} {half} {one} p1 p2 = triv
+land-func {one} {zero} {one} {zero} p1 p2 = triv
+land-func {one} {zero} {one} {half} p1 p2 = triv
+land-func {one} {zero} {one} {one} p1 p2 = triv
+land-func {one} {half} {zero} {zero} p1 p2 = p1
+land-func {one} {half} {zero} {half} p1 p2 = p1
+land-func {one} {half} {zero} {one} p1 p2 = p1
+land-func {one} {half} {half} {zero} p1 p2 = p1
+land-func {one} {half} {half} {half} p1 p2 = triv
+land-func {one} {half} {half} {one} p1 p2 = triv
+land-func {one} {half} {one} {zero} p1 p2 = p2
+land-func {one} {half} {one} {half} p1 p2 = triv
+land-func {one} {half} {one} {one} p1 p2 = triv
+land-func {one} {one} {zero} {zero} p1 p2 = p1
+land-func {one} {one} {zero} {half} p1 p2 = p1
+land-func {one} {one} {zero} {one} p1 p2 = p1
+land-func {one} {one} {half} {zero} p1 p2 = p1
+land-func {one} {one} {half} {half} p1 p2 = p1
+land-func {one} {one} {half} {one} p1 p2 = triv
+land-func {one} {one} {one} {zero} p1 p2 = p2
+land-func {one} {one} {one} {half} p1 p2 = p2
+land-func {one} {one} {one} {one} p1 p2 = triv
+
+lchoice : Three → Three → Three
+lchoice half half = half
+lchoice half one = half
+lchoice one half = half
+lchoice one one = one
+lchoice _ _ = zero
+
+seq-over-lchoice3 : ∀{a b c} → lchoice (land b a) (land c a) ≤3 land (lchoice b c) a
+seq-over-lchoice3 {zero} {zero} {zero} = triv
+seq-over-lchoice3 {zero} {zero} {half} = triv
+seq-over-lchoice3 {zero} {zero} {one} = triv
+seq-over-lchoice3 {zero} {half} {zero} = triv
+seq-over-lchoice3 {zero} {half} {half} = triv
+seq-over-lchoice3 {zero} {half} {one} = triv
+seq-over-lchoice3 {zero} {one} {zero} = triv
+seq-over-lchoice3 {zero} {one} {half} = triv
+seq-over-lchoice3 {zero} {one} {one} = triv
+seq-over-lchoice3 {half} {zero} {zero} = triv
+seq-over-lchoice3 {half} {zero} {half} = triv
+seq-over-lchoice3 {half} {zero} {one} = triv
+seq-over-lchoice3 {half} {half} {zero} = triv
+seq-over-lchoice3 {half} {half} {half} = triv
+seq-over-lchoice3 {half} {half} {one} = triv
+seq-over-lchoice3 {half} {one} {zero} = triv
+seq-over-lchoice3 {half} {one} {half} = triv
+seq-over-lchoice3 {half} {one} {one} = triv
+seq-over-lchoice3 {one} {zero} {zero} = triv
+seq-over-lchoice3 {one} {zero} {half} = triv
+seq-over-lchoice3 {one} {zero} {one} = triv
+seq-over-lchoice3 {one} {half} {zero} = triv
+seq-over-lchoice3 {one} {half} {half} = triv
+seq-over-lchoice3 {one} {half} {one} = triv
+seq-over-lchoice3 {one} {one} {zero} = triv
+seq-over-lchoice3 {one} {one} {half} = triv
+seq-over-lchoice3 {one} {one} {one} = triv
+
+seq-over-lchoice4 : ∀{a b c} → land (lchoice b c) a ≤3 lchoice (land b a) (land c a)
+seq-over-lchoice4 {zero} {zero} {zero} = triv
+seq-over-lchoice4 {zero} {zero} {half} = triv
+seq-over-lchoice4 {zero} {zero} {one} = triv
+seq-over-lchoice4 {zero} {half} {zero} = triv
+seq-over-lchoice4 {zero} {half} {half} = triv
+seq-over-lchoice4 {zero} {half} {one} = triv
+seq-over-lchoice4 {zero} {one} {zero} = triv
+seq-over-lchoice4 {zero} {one} {half} = triv
+seq-over-lchoice4 {zero} {one} {one} = triv
+seq-over-lchoice4 {half} {zero} {zero} = triv
+seq-over-lchoice4 {half} {zero} {half} = triv
+seq-over-lchoice4 {half} {zero} {one} = triv
+seq-over-lchoice4 {half} {half} {zero} = triv
+seq-over-lchoice4 {half} {half} {half} = triv
+seq-over-lchoice4 {half} {half} {one} = triv
+seq-over-lchoice4 {half} {one} {zero} = triv
+seq-over-lchoice4 {half} {one} {half} = triv
+seq-over-lchoice4 {half} {one} {one} = triv
+seq-over-lchoice4 {one} {zero} {zero} = triv
+seq-over-lchoice4 {one} {zero} {half} = triv
+seq-over-lchoice4 {one} {zero} {one} = triv
+seq-over-lchoice4 {one} {half} {zero} = triv
+seq-over-lchoice4 {one} {half} {half} = triv
+seq-over-lchoice4 {one} {half} {one} = triv
+seq-over-lchoice4 {one} {one} {zero} = triv
+seq-over-lchoice4 {one} {one} {half} = triv
+seq-over-lchoice4 {one} {one} {one} = triv
+
+lor : Three → Three → Three
+lor zero zero = zero
+lor zero half = half
+lor zero one = one
+lor half zero = half
+lor half half = half
+lor half one = one
+lor one zero = one
+lor one half = one
+lor one one = one
+
+lor-inj₁ : {a b : Three} → a ≤3 lor a b
+lor-inj₁ {zero} {zero} = triv
+lor-inj₁ {zero} {half} = triv
+lor-inj₁ {zero} {one} = triv
+lor-inj₁ {half} {zero} = triv
+lor-inj₁ {half} {half} = triv
+lor-inj₁ {half} {one} = triv
+lor-inj₁ {one} {zero} = triv
+lor-inj₁ {one} {half} = triv
+lor-inj₁ {one} {one} = triv
+
+lor-inj₂ : {a b : Three} → b ≤3 lor a b
+lor-inj₂ {zero} {zero} = triv
+lor-inj₂ {zero} {half} = triv
+lor-inj₂ {zero} {one} = triv
+lor-inj₂ {half} {zero} = triv
+lor-inj₂ {half} {half} = triv
+lor-inj₂ {half} {one} = triv
+lor-inj₂ {one} {zero} = triv
+lor-inj₂ {one} {half} = triv
+lor-inj₂ {one} {one} = triv
+
+lor-u : {a b c : Three} → a ≤3 c → b ≤3 c → (lor a b) ≤3 c
+lor-u {zero} {zero} {zero} x y = triv
+lor-u {zero} {zero} {half} x y = triv
+lor-u {zero} {zero} {one} x y = triv
+lor-u {zero} {half} {zero} x y = y
+lor-u {zero} {half} {half} x y = triv
+lor-u {zero} {half} {one} x y = triv
+lor-u {zero} {one} {zero} x y = y
+lor-u {zero} {one} {half} x y = y
+lor-u {zero} {one} {one} x y = triv
+lor-u {half} {zero} {zero} x y = x
+lor-u {half} {zero} {half} x y = triv
+lor-u {half} {zero} {one} x y = triv
+lor-u {half} {half} {zero} x y = x
+lor-u {half} {half} {half} x y = triv
+lor-u {half} {half} {one} x y = triv
+lor-u {half} {one} {zero} x y = x
+lor-u {half} {one} {half} x y = y
+lor-u {half} {one} {one} x y = triv
+lor-u {one} {zero} {zero} x y = x
+lor-u {one} {half} {zero} x y = x
+lor-u {one} {one} {zero} x y = x
+lor-u {one} {zero} {half} x y = x
+lor-u {one} {half} {half} x y = x
+lor-u {one} {one} {half} x y = x
+lor-u {one} {zero} {one} x y = triv
+lor-u {one} {half} {one} x y = triv
+lor-u {one} {one} {one} x y = triv
+
+trans3 : {a b c : Three} → a ≤3 b → b ≤3 c → a ≤3 c
+trans3 {zero} {zero} {zero} x y = triv
+trans3 {zero} {zero} {half} x y = triv
+trans3 {zero} {zero} {one} x y = triv
+trans3 {zero} {half} {zero} x y = triv
+trans3 {zero} {half} {half} x y = triv
+trans3 {zero} {half} {one} x y = triv
+trans3 {zero} {one} {zero} x y = triv
+trans3 {zero} {one} {half} x y = triv
+trans3 {zero} {one} {one} x y = triv
+trans3 {half} {zero} {zero} x y = x
+trans3 {half} {zero} {half} x y = triv
+trans3 {half} {zero} {one} x y = triv
+trans3 {half} {half} {zero} x y = y
+trans3 {half} {half} {half} x y = triv
+trans3 {half} {half} {one} x y = triv
+trans3 {half} {one} {zero} x y = y
+trans3 {half} {one} {half} x y = triv
+trans3 {half} {one} {one} x y = triv
+trans3 {one} {zero} {zero} x y = x
+trans3 {one} {zero} {half} x y = x
+trans3 {one} {zero} {one} x y = triv
+trans3 {one} {half} {zero} x y = x
+trans3 {one} {half} {half} x y = x
+trans3 {one} {half} {one} x y = triv
+trans3 {one} {one} {zero} x y = y
+trans3 {one} {one} {half} x y = y
+trans3 {one} {one} {one} x y = triv
+
+coprod-dia₁ : ∀{a b c}
+  → (f : a ≤3 c)
+  → (g : b ≤3 c)
+  → (trans3 {a}{lor a b} (lor-inj₁ {a}{b}) (lor-u {a}{b}{c} f g)) ≡ f
+coprod-dia₁ {zero} {zero} {zero} triv g = refl
+coprod-dia₁ {zero} {zero} {half} triv g = refl
+coprod-dia₁ {zero} {zero} {one} triv g = refl
+coprod-dia₁ {zero} {half} {zero} triv g = refl
+coprod-dia₁ {zero} {half} {half} triv g = refl
+coprod-dia₁ {zero} {half} {one} triv g = refl
+coprod-dia₁ {zero} {one} {zero} triv g = refl
+coprod-dia₁ {zero} {one} {half} triv g = refl
+coprod-dia₁ {zero} {one} {one} triv g = refl
+coprod-dia₁ {half} {zero} {zero} f g = refl
+coprod-dia₁ {half} {half} {zero} f g = refl
+coprod-dia₁ {half} {one} {zero} f g = refl
+coprod-dia₁ {half} {zero} {half} triv g = refl
+coprod-dia₁ {half} {half} {half} triv g = refl
+coprod-dia₁ {half} {one} {half} triv g = refl
+coprod-dia₁ {half} {zero} {one} triv g = refl
+coprod-dia₁ {half} {half} {one} triv g = refl
+coprod-dia₁ {half} {one} {one} triv g = refl
+coprod-dia₁ {one} {zero} {zero} f g = refl
+coprod-dia₁ {one} {zero} {half} f g = refl
+coprod-dia₁ {one} {zero} {one} triv g = refl
+coprod-dia₁ {one} {half} {zero} f g = refl
+coprod-dia₁ {one} {half} {half} f g = refl
+coprod-dia₁ {one} {half} {one} triv g = refl
+coprod-dia₁ {one} {one} {zero} f g = refl
+coprod-dia₁ {one} {one} {half} f g = refl
+coprod-dia₁ {one} {one} {one} triv g = refl
+
+coprod-dia₂ : ∀{a b c}
+  → (f : a ≤3 c)
+  → (g : b ≤3 c)
+  → (trans3 {b}{lor a b} (lor-inj₂ {a}{b}) (lor-u {a}{b}{c} f g)) ≡ g
+coprod-dia₂ {zero} {zero} {zero} f triv = refl
+coprod-dia₂ {zero} {zero} {half} f triv = refl
+coprod-dia₂ {zero} {zero} {one} f triv = refl
+coprod-dia₂ {zero} {half} {zero} f g = refl
+coprod-dia₂ {zero} {half} {half} f triv = refl
+coprod-dia₂ {zero} {half} {one} f triv = refl
+coprod-dia₂ {zero} {one} {zero} f g = refl
+coprod-dia₂ {zero} {one} {half} f g = refl
+coprod-dia₂ {zero} {one} {one} f triv = refl
+coprod-dia₂ {half} {zero} {zero} f triv = refl
+coprod-dia₂ {half} {half} {zero} f ()
+coprod-dia₂ {half} {one} {zero} f ()
+coprod-dia₂ {half} {zero} {half} f triv = refl
+coprod-dia₂ {half} {half} {half} f triv = refl
+coprod-dia₂ {half} {one} {half} f g = refl
+coprod-dia₂ {half} {zero} {one} f triv = refl
+coprod-dia₂ {half} {half} {one} f triv = refl
+coprod-dia₂ {half} {one} {one} f triv = refl
+coprod-dia₂ {one} {zero} {zero} f triv = refl
+coprod-dia₂ {one} {zero} {half} f triv = refl
+coprod-dia₂ {one} {zero} {one} f triv = refl
+coprod-dia₂ {one} {half} {zero} f ()
+coprod-dia₂ {one} {half} {half} f triv = refl
+coprod-dia₂ {one} {half} {one} f triv = refl
+coprod-dia₂ {one} {one} {zero} f ()
+coprod-dia₂ {one} {one} {half} f ()
+coprod-dia₂ {one} {one} {one} f triv = refl
 
 -- Since land is non-commutative the second projection doesn't hold:
 -- land-proj₂ : {a b : Three} → land a b ≤3 b
@@ -707,35 +995,6 @@ land-proj₁ {one} {one} = triv
 -- land-proj₂ {one} {zero} = triv
 -- land-proj₂ {one} {half} = triv
 -- land-proj₂ {one} {one} = triv
-
-land-ctr : ∀{c a b} → c ≤3 a → c ≤3 b → c ≤3 (land a b)
-land-ctr {zero} {zero} {zero} x x₁ = triv
-land-ctr {zero} {zero} {half} x x₁ = triv
-land-ctr {zero} {zero} {one} x x₁ = triv
-land-ctr {zero} {half} {zero} x x₁ = triv
-land-ctr {zero} {half} {half} x x₁ = triv
-land-ctr {zero} {half} {one} x x₁ = triv
-land-ctr {zero} {one} {zero} x x₁ = triv
-land-ctr {zero} {one} {half} x x₁ = triv
-land-ctr {zero} {one} {one} x x₁ = triv
-land-ctr {half} {zero} {zero} x x₁ = x
-land-ctr {half} {zero} {half} x x₁ = x
-land-ctr {half} {zero} {one} x x₁ = x
-land-ctr {half} {half} {zero} x x₁ = triv
-land-ctr {half} {half} {half} x x₁ = triv
-land-ctr {half} {half} {one} x x₁ = triv
-land-ctr {half} {one} {zero} x x₁ = x₁
-land-ctr {half} {one} {half} x x₁ = triv
-land-ctr {half} {one} {one} x x₁ = triv
-land-ctr {one} {zero} {zero} x x₁ = x
-land-ctr {one} {zero} {half} x x₁ = x
-land-ctr {one} {zero} {one} x x₁ = x
-land-ctr {one} {half} {zero} x x₁ = x
-land-ctr {one} {half} {half} x x₁ = x
-land-ctr {one} {half} {one} x x₁ = x
-land-ctr {one} {one} {zero} x x₁ = x₁
-land-ctr {one} {one} {half} x x₁ = x₁
-land-ctr {one} {one} {one} x x₁ = triv
 
 -----------------------------------------------------------------------
 -- The lineale 4                                                     --

@@ -559,6 +559,9 @@ chooseᵣ α β (inj₂ x) (inj₂ y) = β x y
 choose : Obj → Obj → Obj
 choose (U , X , α) (V , Y , β) = (U ⊎ V) , (X ⊎ Y) , chooseᵣ α β
 
+_⊔ₒ_ : Obj → Obj → Obj
+x ⊔ₒ y = choose x y
+
 choose-assoc : ∀{A B C} → Hom (choose A (choose B C)) (choose (choose A B) C)
 choose-assoc {U , X , α}{V , Y , β}{W , Z , γ} = ⊎-assoc , ⊎-assoc-inv , (λ {x y} → cond {x}{y})
  where
