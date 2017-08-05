@@ -1,6 +1,3 @@
-open import prelude
-open import atl-lineale
-
 -----------------------------------------------------------------------
 -- The definition of the dialectica category GC on Sets              --
 -- parameterized by an arbitrary lineale.  GC is described in        --
@@ -8,6 +5,10 @@ open import atl-lineale
 --   http://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-213.pdf          --
 -----------------------------------------------------------------------
 module ATL-Dialectica where
+
+open import prelude
+open import atl-lineale
+open import atl-lineale-thms
 
 -- module DialSets-local-defs where
 --   -----------------------------------------------------------------------
@@ -45,15 +46,15 @@ obj-snd (U , X , α) = X
 Hom : Obj → Obj → Set
 Hom (U , X , α) (V , Y , β) =
   Σ[ f ∈ (U → V) ]
-    (Σ[ F ∈ (Y → X) ] (∀{u : U}{y : Y} → α u (F y) ≤3 β (f u) y))
+    (Σ[ F ∈ (Y → X) ] (∀{u : U}{y : Y} → α u (F y) ≤₃ β (f u) y))
 
 -- Composition:
 comp : {A B C : Obj} → Hom A B → Hom B C → Hom A C
 comp {(U , X , α)} {(V , Y , β)} {(W , Z , γ)} (f , F , p₁) (g , G , p₂) =
   (g ∘ f , F ∘ G , cond)
   where
-   cond : {u : U} {y : Z} → (α u (F (G y))) ≤3 (γ (g (f u)) y)
-   cond {u}{z} = trans3 {α u (F (G z))}{β (f u) (G z)} {γ (g (f u)) z} p₁ p₂
+   cond : {u : U} {y : Z} → (α u (F (G y))) ≤₃ (γ (g (f u)) y)
+   cond {u}{z} = trans₃ {α u (F (G z))}{β (f u) (G z)} {γ (g (f u)) z} p₁ p₂
 
 infixl 5 _○_
 
@@ -63,7 +64,7 @@ _○_ = comp
 Homₐ :  {A' A B B' : Obj} → Hom A' A → Hom B B' → Hom A B → Hom A' B'
 Homₐ f h g = comp f (comp g h)
 
-refl3 : {a : Three} → a ≤3 a
+refl3 : {a : Three} → a ≤₃ a
 refl3 {zero} = triv
 refl3 {half} = triv
 refl3 {one} = triv
@@ -118,6 +119,185 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 
 ○-idr : ∀{A B}{f : Hom A B} → f ○ id ≡h f
 ○-idr {U , X , _}{V , Y , _}{f , F , _} = refl , refl
+
+_⊙ᵣ_ : ∀{U X V Y : Set} → (U → X → Three) → (V → Y → Three) → ((U × V) → (X × Y) → Three)
+_⊙ᵣ_ α β (u , v) (x , y) = (α u x) ⊙₃ (β v y)
+
+_⊙_ : (A B : Obj) → Obj
+(U , X , α) ⊙ (V , Y , β) = ((U × V) , (X × Y) , α ⊙ᵣ β)
+
+F⊙ : ∀{S Z W T V X U Y : Set}{f : U → W}{F : Z → X}{g : V → S}{G : T → Y} → (S → Z) × (W → T) → (V → X) × (U → Y)
+F⊙ {f = f}{F}{g}{G} (h₁ , h₂) = (λ v → F(h₁ (g v))) , (λ u → G(h₂ (f u)))
+  
+_⊙ₐ_ : {A B C D : Obj} → Hom A C → Hom B D → Hom (A ⊙ B) (C ⊙ D)
+_⊙ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁) (g , G , p₂) = ⟨ f , g ⟩ , {!!} , {!!} -- (λ {u y} → cond {u}{y})
+ where
+  -- cond : {u : Σ U (λ x → V)} {y : Σ (S → Z) (λ x → W → T)} →
+  --     ((α ⊙ᵣ β) u (F⊙ {f = f}{F}{g}{G} y)) ≤₃ ((γ ⊙ᵣ δ) (⟨ f , g ⟩ u) y)
+  -- cond {u , v}{h , j} = ⊙₃-func {α u (F (h (g v)))}{β v (G (j ( f u)))}{γ (f u) (h (g v))}{δ (g v) (j (f u))} p₁ p₂
+
+{-
+seq-rel : ∀{U X V Y : Set} → (U → X → Three) → (V → Y → Three) → (U × V) → (X × Y) → Three
+seq-rel α β (u , v) (x , y) = (α u x) ▷₃ (β v y)
+
+_▷_ : Obj → Obj → Obj
+(U , X , α) ▷ (V , Y , β) = (U × V) , (X × Y) , seq-rel α β
+
+seq-func : {A B C D : Obj} → Hom A C → Hom B D → Hom (A ▷ B) (C ▷ D)
+seq-func {U , X , α} {V , Y , β} {W , Z , γ} {M , T , φ} (f , F , p1) (g , G , p2) = (prod-func f g) , (prod-func F G , (λ {u : U × V}{y : Z × T} → aux {u}{y}))
+ where
+   prod-func : {U V W M : Set} → (U → W) → (V → M) → U × V → W × M
+   prod-func f g ( u , v ) = (f u , g v)
+
+   aux : {u : U × V} {y : Z × T} → seq-rel α β u (prod-func F G y) ≤₃ seq-rel γ φ (prod-func f g u) y
+   aux {u , v}{z , t} = land-func {α u (F z)} {β v (G t)} {γ (f u) z} {φ (g v) t} p1 p2
+
+⊙-ex : {A B : Obj} → Hom (A ⊙ B) (B ⊙ A)
+⊙-ex {U , X , α}{V , Y , β} = (λ p → snd p , fst p) , ((λ p → snd p , fst p)) , (λ {p₁} {p₂} → aux {p₁}{p₂})
+ where
+  aux : {u : U × V} {y : (U → Y) × (V → X)} → (α ⊙ᵣ β) u (snd y , fst y) ≤₃ (β ⊙ᵣ α) (snd u , fst u) y
+  aux {u , v}{h , j} = ⊙-symm₃ {α u (j v)}{β v (h u)}
+   
+_⊔ᵣ_ : {U V X Y : Set} → (U → X → Three) → (V → Y → Three) → U ⊎ V → X ⊎ Y → Three
+_⊔ᵣ_ α β (inj₁ u) (inj₁ x) = α u x
+_⊔ᵣ_ α β (inj₁ u) (inj₂ y) = zero
+_⊔ᵣ_ α β (inj₂ v) (inj₁ x) = zero
+_⊔ᵣ_ α β (inj₂ v) (inj₂ y) = β v y
+
+_⊔ₒ_ : Obj → Obj → Obj
+_⊔ₒ_ (U , X , α) (V , Y , β) = (U ⊎ V) , (X ⊎ Y) , α ⊔ᵣ β
+
+choose-assoc : ∀{A B C} → Hom (A ⊔ₒ (B ⊔ₒ C)) ((A ⊔ₒ B) ⊔ₒ C)
+choose-assoc {U , X , α}{V , Y , β}{W , Z , γ} = ⊎-assoc , ⊎-assoc-inv , (λ {x y} → cond {x}{y})
+ where
+  cond : {u : U ⊎ V ⊎ W} {y : (X ⊎ Y) ⊎ Z} →      
+      (_⊔ᵣ_ α (_⊔ᵣ_ β γ) u (⊎-assoc-inv y)) ≤₃ (_⊔ᵣ_ (α ⊔ᵣ β) γ (⊎-assoc u) y)
+  cond {inj₁ x} {inj₁ (inj₁ y)} = refl₃ {α x y}
+  cond {inj₁ x} {inj₁ (inj₂ y)} = triv
+  cond {inj₁ x} {inj₂ y} = triv
+  cond {inj₂ (inj₁ x)} {inj₁ (inj₁ y)} = triv
+  cond {inj₂ (inj₁ x)} {inj₁ (inj₂ y)} = refl₃ {β x y}
+  cond {inj₂ (inj₁ x)} {inj₂ y} = triv
+  cond {inj₂ (inj₂ x)} {inj₁ (inj₁ y)} = triv
+  cond {inj₂ (inj₂ x)} {inj₁ (inj₂ y)} = triv
+  cond {inj₂ (inj₂ x)} {inj₂ y} = refl₃ {γ x y}
+
+choose-assoc-inv : ∀{A B C} → Hom ((A ⊔ₒ B) ⊔ₒ C) (A ⊔ₒ (B ⊔ₒ C))
+choose-assoc-inv {U , X , α}{V , Y , β}{W , Z , γ} = ⊎-assoc-inv , ⊎-assoc , (λ {u y} → cond {u}{y})
+ where
+   cond : {u : (U ⊎ V) ⊎ W} {y : X ⊎ Y ⊎ Z} →
+     (_⊔ᵣ_ (_⊔ᵣ_ α β) γ u (⊎-assoc y)) ≤₃ (_⊔ᵣ_ α (_⊔ᵣ_ β γ) (⊎-assoc-inv u) y)
+   cond {inj₁ (inj₁ x)} {inj₁ y} = refl₃ {α x y}
+   cond {inj₁ (inj₁ x)} {inj₂ (inj₁ y)} = triv
+   cond {inj₁ (inj₁ x)} {inj₂ (inj₂ y)} = triv
+   cond {inj₁ (inj₂ x)} {inj₁ y} = triv
+   cond {inj₁ (inj₂ x)} {inj₂ (inj₁ y)} = refl₃ {β x y}
+   cond {inj₁ (inj₂ x)} {inj₂ (inj₂ y)} = triv
+   cond {inj₂ x} {inj₁ y} = triv
+   cond {inj₂ x} {inj₂ (inj₁ y)} = triv
+   cond {inj₂ x} {inj₂ (inj₂ y)} = refl₃ {γ x y}
+
+choose-assoc-iso₁ : ∀{A B C} → choose-assoc {A}{B}{C} ○ choose-assoc-inv ≡h id
+choose-assoc-iso₁ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set ⊎-assoc-iso₁ , ext-set ⊎-assoc-iso₁
+
+choose-assoc-iso₂ : ∀{A B C} → choose-assoc-inv {A}{B}{C} ○ choose-assoc ≡h id
+choose-assoc-iso₂ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set ⊎-assoc-iso₂ , ext-set ⊎-assoc-iso₂
+
+choose-sym : ∀{A B} → Hom (A ⊔ₒ B) (B ⊔ₒ A)
+choose-sym {U , X , α}{V , Y , β} = ⊎-sym , ⊎-sym , (λ {u y} → cond {u}{y})
+ where
+   cond : {u : U ⊎ V} {y : Y ⊎ X} → (_⊔ᵣ_ α β u (⊎-sym y)) ≤₃ (_⊔ᵣ_ β α (⊎-sym u) y)
+   cond {inj₁ x} {inj₁ y} = triv
+   cond {inj₁ x} {inj₂ y} = refl₃ {α x y}
+   cond {inj₂ x} {inj₁ y} = refl₃ {β x y}
+   cond {inj₂ x} {inj₂ y} = triv
+
+choose-contract : ∀{A : Obj} → Hom (A ⊔ₒ A) A
+choose-contract {U , X , α} = aux₁ , inj₁ , (λ {u y} → cond {u}{y})
+ where
+  aux₁ : U ⊎ U → U
+  aux₁ (inj₁ x) = x
+  aux₁ (inj₂ y) = y
+
+  cond : {u : U ⊎ U} {y : X} → (_⊔ᵣ_ α α u (inj₁ y)) ≤₃ (α (aux₁ u) y)
+  cond {inj₁ u}{x} = refl₃ {α u x}
+  cond {inj₂ u}{x} = triv
+
+choice-seq-dist-aux₁ : {U V W : Set} → Σ (U ⊎ V) (λ x → W) → Σ U (λ x → W) ⊎ Σ V (λ x → W)
+choice-seq-dist-aux₁ (inj₁ x , b) = inj₁ (x , b)
+choice-seq-dist-aux₁ (inj₂ y , b) = inj₂ (y , b)
+
+choice-seq-dist-aux₂ : {X Z Y : Set} → Σ X (λ x → Z) ⊎ Σ Y (λ x → Z) → Σ (X ⊎ Y) (λ x → Z)
+choice-seq-dist-aux₂ (inj₁ (a , b)) = inj₁ a , b
+choice-seq-dist-aux₂ (inj₂ (a , b)) = inj₂ a , b
+
+choice-seq-dist : {A B C : Obj} → Hom ((A ⊔ₒ B) ▷ C) ((A ▷ C) ⊔ₒ (B ▷ C))
+choice-seq-dist {U , X , α}{V , Y , β}{W , Z , γ} = choice-seq-dist-aux₁ , choice-seq-dist-aux₂ , (λ {u y} → cond {u}{y})
+ where
+  cond : {u : Σ (U ⊎ V) (λ x → W)}
+      {y : Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)} →
+      seq-rel (_⊔ᵣ_ α β) γ u (choice-seq-dist-aux₂ y)
+      ≤₃
+      _⊔ᵣ_ (seq-rel α γ) (seq-rel β γ) (choice-seq-dist-aux₁ u) y
+  cond {inj₁ u , w} {inj₁ (a , b)} = refl₃ {α u a ▷₃ γ w b}
+  cond {inj₁ u , w} {inj₂ (a , b)} = triv
+  cond {inj₂ u , w} {inj₁ (a , b)} = triv
+  cond {inj₂ u , w} {inj₂ (a , b)} = refl₃ {β u a ▷₃ γ w b}
+
+choice-seq-dist-inv-aux₁ : {U W V : Set} → Σ U (λ x → W) ⊎ Σ V (λ x → W) → Σ (U ⊎ V) (λ x → W)
+choice-seq-dist-inv-aux₁ (inj₁ (a , b)) = inj₁ a , b
+choice-seq-dist-inv-aux₁ (inj₂ (a , b)) = inj₂ a , b
+
+choice-seq-dist-inv-aux₂ : {X Y Z : Set} → Σ (X ⊎ Y) (λ x → Z) → Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)
+choice-seq-dist-inv-aux₂ (inj₁ x , z) = inj₁ (x , z)
+choice-seq-dist-inv-aux₂ (inj₂ y , z) = inj₂ (y , z)
+  
+choice-seq-dist-inv : {A B C : Obj} → Hom ((A ▷ C) ⊔ₒ (B ▷ C)) ((A ⊔ₒ B) ▷ C)
+choice-seq-dist-inv {U , X , α}{V , Y , β}{W , Z , γ} = choice-seq-dist-inv-aux₁ , choice-seq-dist-inv-aux₂ , (λ {u y} → cond {u}{y})
+ where  
+  cond : {u : Σ U (λ x → W) ⊎ Σ V (λ x → W)}
+      {y : Σ (X ⊎ Y) (λ x → Z)} →
+      _⊔ᵣ_ (seq-rel α γ) (seq-rel β γ) u (choice-seq-dist-inv-aux₂ y)
+      ≤₃
+      seq-rel
+      (_⊔ᵣ_ α β) γ (choice-seq-dist-inv-aux₁ u) y
+  cond {inj₁ (a , b)} {inj₁ x , y} = refl₃ {α a x ▷₃ γ b y}
+  cond {inj₁ (a , b)} {inj₂ x , y} = triv
+  cond {inj₂ (a , b)} {inj₁ x , y} = triv
+  cond {inj₂ (a , b)} {inj₂ x , y} = refl₃ {β a x ▷₃ γ b y}
+
+choice-seq-dist-iso₁ : {A B C : Obj} → choice-seq-dist {A}{B}{C} ○ choice-seq-dist-inv ≡h id {(A ⊔ₒ B) ▷ C}
+choice-seq-dist-iso₁ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux₁ , ext-set aux₂
+  where
+    aux₁ : {a : Σ (U ⊎ V) (λ x → W)} → choice-seq-dist-inv-aux₁ (choice-seq-dist-aux₁ a) ≡ a
+    aux₁ {inj₁ x , b} = refl
+    aux₁ {inj₂ y , b} = refl
+
+    aux₂ : {a : Σ (X ⊎ Y) (λ x → Z)} → choice-seq-dist-aux₂ (choice-seq-dist-inv-aux₂ a) ≡ a
+    aux₂ {inj₁ x , b} = refl
+    aux₂ {inj₂ y , b} = refl
+
+choice-seq-dist-iso₂ : {A B C : Obj} → choice-seq-dist-inv {A}{B}{C} ○ choice-seq-dist ≡h id {(A ▷ C) ⊔ₒ (B ▷ C)}
+choice-seq-dist-iso₂ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux₁ , ext-set aux₂
+ where
+   aux₁ : {a : Σ U (λ x → W) ⊎ Σ V (λ x → W)} → choice-seq-dist-aux₁ (choice-seq-dist-inv-aux₁ a) ≡ a
+   aux₁ {inj₁ (a , b)} = refl
+   aux₁ {inj₂ (a , b)} = refl
+
+   aux₂ : {a : Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)} → choice-seq-dist-inv-aux₂ (choice-seq-dist-aux₂ a) ≡ a
+   aux₂ {inj₁ (a , b)} = refl
+   aux₂ {inj₂ (a , b)} = refl
+
+choice-para-dist-aux₁ : {U V W : Set} → (U ⊎ V) × W → U × W ⊎ V × W
+choice-para-dist-aux₁ (inj₁ a , b) = inj₁ (a , b)
+choice-para-dist-aux₁ (inj₂ a , b) = inj₂ (a , b)
+
+choice-para-dist-aux₂ : {U V W X Y Z : Set} → (W → X) × (U → Z) ⊎ (W → Y) × (V → Z) → (W → X ⊎ Y) × (U ⊎ V → Z)
+choice-para-dist-aux₂ (inj₁ (f , h)) = (λ w → inj₁ (f w)) , {!!}
+choice-para-dist-aux₂ (inj₂ (g , j)) = {!!}
+
+choice-para-dist : {A B C : Obj} → Hom ((A ⊔ₒ B) ⊙ C) ((A ⊙ C) ⊔ₒ (B ⊙ C))
+choice-para-dist {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-dist-aux₁ , choice-para-dist-aux₂ , {!!}
 
 
 -- -----------------------------------------------------------------------
@@ -518,14 +698,14 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- -- easily see that all of the symmetric monoidal properties of
 -- -- disjoint union will lift up to the dialectica space.  Notice that
 -- -- it is not, however, a coproduct.
--- chooseᵣ : {U V X Y : Set ℓ} → (U → X → L) → (V → Y → L) → U ⊎ V → X ⊎ Y → L
--- chooseᵣ α β (inj₁ x) (inj₁ y) = α x y
--- chooseᵣ α β (inj₁ x) (inj₂ y) = ∅
--- chooseᵣ α β (inj₂ x) (inj₁ y) = ∅
--- chooseᵣ α β (inj₂ x) (inj₂ y) = β x y
+-- _⊔ᵣ_ : {U V X Y : Set ℓ} → (U → X → L) → (V → Y → L) → U ⊎ V → X ⊎ Y → L
+-- _⊔ᵣ_ α β (inj₁ x) (inj₁ y) = α x y
+-- _⊔ᵣ_ α β (inj₁ x) (inj₂ y) = ∅
+-- _⊔ᵣ_ α β (inj₂ x) (inj₁ y) = ∅
+-- _⊔ᵣ_ α β (inj₂ x) (inj₂ y) = β x y
 
 -- choose : Obj → Obj → Obj
--- choose (U , X , α) (V , Y , β) = (U ⊎ V) , (X ⊎ Y) , chooseᵣ α β
+-- choose (U , X , α) (V , Y , β) = (U ⊎ V) , (X ⊎ Y) , _⊔ᵣ_ α β
 
 -- _⊔ₒ_ : Obj → Obj → Obj
 -- x ⊔ₒ y = choose x y
@@ -534,7 +714,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-assoc {U , X , α}{V , Y , β}{W , Z , γ} = ⊎-assoc , ⊎-assoc-inv , (λ {x y} → cond {x}{y})
 --  where
 --   cond : {u : U ⊎ V ⊎ W} {y : (X ⊎ Y) ⊎ Z} →      
---       (chooseᵣ α (chooseᵣ β γ) u (⊎-assoc-inv y)) ≤L (chooseᵣ (chooseᵣ α β) γ (⊎-assoc u) y)
+--       (_⊔ᵣ_ α (_⊔ᵣ_ β γ) u (⊎-assoc-inv y)) ≤L (_⊔ᵣ_ (_⊔ᵣ_ α β) γ (⊎-assoc u) y)
 --   cond {inj₁ x} {inj₁ (inj₁ y)} = reflL
 --   cond {inj₁ x} {inj₁ (inj₂ y)} = reflL
 --   cond {inj₁ x} {inj₂ y} = reflL
@@ -549,7 +729,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-assoc-inv {U , X , α}{V , Y , β}{W , Z , γ} = ⊎-assoc-inv , ⊎-assoc , (λ {u y} → cond {u}{y})
 --  where
 --    cond : {u : (U ⊎ V) ⊎ W} {y : X ⊎ Y ⊎ Z} →
---      (chooseᵣ (chooseᵣ α β) γ u (⊎-assoc y)) ≤L (chooseᵣ α (chooseᵣ β γ) (⊎-assoc-inv u) y)
+--      (_⊔ᵣ_ (_⊔ᵣ_ α β) γ u (⊎-assoc y)) ≤L (_⊔ᵣ_ α (_⊔ᵣ_ β γ) (⊎-assoc-inv u) y)
 --    cond {inj₁ (inj₁ x)} {inj₁ y} = reflL
 --    cond {inj₁ (inj₁ x)} {inj₂ (inj₁ y)} = reflL
 --    cond {inj₁ (inj₁ x)} {inj₂ (inj₂ y)} = reflL
@@ -569,7 +749,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-sym : ∀{A B} → Hom (choose A B) (choose B A)
 -- choose-sym {U , X , α}{V , Y , β} = ⊎-sym , ⊎-sym , (λ {u y} → cond {u}{y})
 --  where
---    cond : {u : U ⊎ V} {y : Y ⊎ X} → (chooseᵣ α β u (⊎-sym y)) ≤L (chooseᵣ β α (⊎-sym u) y)
+--    cond : {u : U ⊎ V} {y : Y ⊎ X} → (_⊔ᵣ_ α β u (⊎-sym y)) ≤L (_⊔ᵣ_ β α (⊎-sym u) y)
 --    cond {inj₁ x} {inj₁ y} = reflL
 --    cond {inj₁ x} {inj₂ y} = reflL
 --    cond {inj₂ x} {inj₁ y} = reflL
@@ -579,7 +759,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-left-ident {U , X , α} = ⊎-left-ident , ⊎-left-ident-inv , (λ {u y} → cond {u}{y})
 --  where
 --   cond : {u : ⊥ ⊎ U} {y : X} →
---       (chooseᵣ {⊥ {ℓ}}{U}{⊥ {ℓ}} (λ x y₁ → ∅) α u (inj₂ y)) ≤L (α (⊎-left-ident u) y)
+--       (_⊔ᵣ_ {⊥ {ℓ}}{U}{⊥ {ℓ}} (λ x y₁ → ∅) α u (inj₂ y)) ≤L (α (⊎-left-ident u) y)
 --   cond {inj₁ u}{x} = ⊥-elim {ℓ} u
 --   cond {inj₂ u}{x} = reflL
 
@@ -587,7 +767,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-left-ident-inv {U , X , α} = ⊎-left-ident-inv , ⊎-left-ident , ((λ {u y} → cond {u}{y}))
 --  where
 --   cond : {u : U} {y : ⊥ ⊎ X} →
---       (α u (⊎-left-ident y)) ≤L (chooseᵣ {⊥ {ℓ}} (λ x y₁ → ∅) α (inj₂ u) y)
+--       (α u (⊎-left-ident y)) ≤L (_⊔ᵣ_ {⊥ {ℓ}} (λ x y₁ → ∅) α (inj₂ u) y)
 --   cond {y = inj₁ x} = ⊥-elim {ℓ} x
 --   cond {y = inj₂ y} = reflL
 
@@ -601,7 +781,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-right-ident {U , X , α} = ⊎-right-ident , ⊎-right-ident-inv , (λ {u y} → cond {u}{y})
 --  where
 --   cond : {u : U ⊎ ⊥} {y : X} →      
---       (chooseᵣ {U}{⊥ {ℓ}}{X}{⊥ {ℓ}} α (λ x y₁ → ∅) u (inj₁ y)) ≤L (α (⊎-right-ident u) y)
+--       (_⊔ᵣ_ {U}{⊥ {ℓ}}{X}{⊥ {ℓ}} α (λ x y₁ → ∅) u (inj₁ y)) ≤L (α (⊎-right-ident u) y)
 --   cond {inj₁ x} = reflL
 --   cond {inj₂ y} = ⊥-elim {ℓ} y
 
@@ -609,7 +789,7 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 -- choose-right-ident-inv {U , X , α} = ⊎-right-ident-inv , ⊎-right-ident , (λ {u y} → cond {u}{y})
 --  where
 --   cond : {u : U} {y : X ⊎ ⊥} →
---       (α u (⊎-right-ident y)) ≤L (chooseᵣ {_}{⊥ {ℓ}} α (λ x y₁ → ∅) (inj₁ u) y)
+--       (α u (⊎-right-ident y)) ≤L (_⊔ᵣ_ {_}{⊥ {ℓ}} α (λ x y₁ → ∅) (inj₁ u) y)
 --   cond {y = inj₁ x} = reflL
 --   cond {y = inj₂ y} = ⊥-elim {ℓ} y
 
@@ -633,8 +813,8 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 --   aux₂ (inj₂ y , b) = inj₂ b , inj₁ y
 
 --   cond : {u : (U ⊎ W) ⊎ V ⊎ W} {y : Σ (X ⊎ Y) (λ x → Z)} →
---       (+-cond (chooseᵣ α γ) (chooseᵣ β γ) u (aux₂ y)) ≤L
---       (+-cond (chooseᵣ α β) γ (aux₁ u) y)
+--       (+-cond (_⊔ᵣ_ α γ) (_⊔ᵣ_ β γ) u (aux₂ y)) ≤L
+--       (+-cond (_⊔ᵣ_ α β) γ (aux₁ u) y)
 --   cond {inj₁ (inj₁ x)} {inj₁ x₁ , b} = reflL
 --   cond {inj₁ (inj₁ x)} {inj₂ y , b} = reflL
 --   cond {inj₁ (inj₂ x)} {inj₁ x₁ , b} = a-unit-least al-pf
@@ -651,6 +831,8 @@ _≡h_ {(U , X , α)}{(V , Y , β)} (f , F , p₁) (g , G , p₂) = f ≡ g × F
 --   aux₁ (inj₁ x) = x
 --   aux₁ (inj₂ y) = y
 
---   cond : {u : U ⊎ U} {y : X} → (chooseᵣ α α u (inj₁ y)) ≤L (α (aux₁ u) y)
+--   cond : {u : U ⊎ U} {y : X} → (_⊔ᵣ_ α α u (inj₁ y)) ≤L (α (aux₁ u) y)
 --   cond {inj₁ u}{x} = reflL
 --   cond {inj₂ u}{x} = a-unit-least al-pf                
+
+-}

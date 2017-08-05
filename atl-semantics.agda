@@ -23,17 +23,29 @@ one ≤₃ half = ⊥
 _ ≤₃ _ = ⊤
 
 _⊙₃_ : Three → Three → Three
-zero ⊙₃ zero = half
-zero ⊙₃ half = half
-half ⊙₃ zero = half
 half ⊙₃ half = half
-_ ⊙₃ _ = one
+half ⊙₃ one = half
+one ⊙₃ half = half
+one ⊙₃ one = half
+_ ⊙₃ _ = zero
+
+_⊸₃_ : Three → Three → Three
+half ⊸₃ zero = zero
+one ⊸₃ zero = zero
+one ⊸₃ half = one
+_ ⊸₃ _ = one
 
 _▷₃_ : Three → Three → Three
 zero ▷₃ one = one
 half ▷₃ one = one
 one ▷₃ one = one
 _ ▷₃ _ = half
+
+_⇀₃_ : Three → Three → Three
+half ⇀₃ zero = zero
+one ⇀₃ zero = zero
+zero ⇀₃ zero = zero
+_ ⇀₃ _ = one
 
 infix 4 _⊔₃_
 
@@ -45,24 +57,4 @@ one ⊔₃ one = one
 _ ⊔₃ _ = zero
 
 unit₃ = half
-  
-_⊸₃_ : Three → Three → Three
-half ⊸₃ zero = zero
-half ⊸₃ half = half
-one ⊸₃ zero = zero
-one ⊸₃ half = zero
-_ ⊸₃ _ = one
-  
-_↼₃_ : Three → Three → Three
-zero ↼₃ half = zero
-zero ↼₃ one = zero
-half ↼₃ half = half
-half ↼₃ one = half
-_ ↼₃ _ = one
-
-_⇀₃_ : Three → Three → Three
-half ⇀₃ zero = zero
-one ⇀₃ zero = zero
-one ⇀₃ half = zero
-_ ⇀₃ _ = one
 

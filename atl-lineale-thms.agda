@@ -3,6 +3,11 @@ module atl-lineale-thms where
 open import prelude
 open import atl-lineale
 
+refl₃ : {a : Three} → a ≤₃ a
+refl₃ {zero} = triv
+refl₃ {half} = triv
+refl₃ {one} = triv
+
 symm₃ : {a b : Three} → a ⊙₃ b ≡ b ⊙₃ a
 symm₃ {zero} {zero} = refl
 symm₃ {zero} {half} = refl
@@ -13,6 +18,17 @@ symm₃ {half} {one} = refl
 symm₃ {one} {zero} = refl
 symm₃ {one} {half} = refl
 symm₃ {one} {one} = refl
+
+⊙-symm₃ : {a b : Three} → a ⊙₃ b ≤₃ b ⊙₃ a
+⊙-symm₃ {zero} {zero} = triv
+⊙-symm₃ {zero} {half} = triv
+⊙-symm₃ {zero} {one} = triv
+⊙-symm₃ {half} {zero} = triv
+⊙-symm₃ {half} {half} = triv
+⊙-symm₃ {half} {one} = triv
+⊙-symm₃ {one} {zero} = triv
+⊙-symm₃ {one} {half} = triv
+⊙-symm₃ {one} {one} = triv
 
 assoc₃ : {a b c : Three} → a ⊙₃ (b ⊙₃ c) ≡ (a ⊙₃ b) ⊙₃ c
 assoc₃ {zero} {zero} {zero} = refl
@@ -111,6 +127,89 @@ land-assoc {one} {one} {zero} = refl
 land-assoc {one} {one} {half} = refl
 land-assoc {one} {one} {one} = refl
 
+⊙₃-func : {a b c d : Three} → a ≤₃ c → b ≤₃ d → (a ⊙₃ b) ≤₃ (c ⊙₃ d)
+⊙₃-func {zero} {zero} {zero} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {zero} {half} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {zero} {one} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {half} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {half} {half} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {half} {one} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {one} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {one} {half} p₁ p₂ = triv
+⊙₃-func {zero} {zero} {one} {one} p₁ p₂ = triv
+⊙₃-func {zero} {half} {zero} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {half} {zero} {half} p₁ p₂ = triv
+⊙₃-func {zero} {half} {zero} {one} p₁ p₂ = triv
+⊙₃-func {zero} {half} {half} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {half} {half} {half} p₁ p₂ = triv
+⊙₃-func {zero} {half} {half} {one} p₁ p₂ = triv
+⊙₃-func {zero} {half} {one} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {half} {one} {half} p₁ p₂ = triv
+⊙₃-func {zero} {half} {one} {one} p₁ p₂ = triv
+⊙₃-func {zero} {one} {zero} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {one} {zero} {half} p₁ p₂ = triv
+⊙₃-func {zero} {one} {zero} {one} p₁ p₂ = triv
+⊙₃-func {zero} {one} {half} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {one} {half} {half} p₁ p₂ = triv
+⊙₃-func {zero} {one} {half} {one} p₁ p₂ = triv
+⊙₃-func {zero} {one} {one} {zero} p₁ p₂ = triv
+⊙₃-func {zero} {one} {one} {half} p₁ p₂ = triv
+⊙₃-func {zero} {one} {one} {one} p₁ p₂ = triv
+⊙₃-func {half} {zero} {zero} {zero} p₁ p₂ = triv
+⊙₃-func {half} {zero} {zero} {half} p₁ p₂ = triv
+⊙₃-func {half} {zero} {zero} {one} p₁ p₂ = triv
+⊙₃-func {half} {zero} {half} {zero} p₁ p₂ = triv
+⊙₃-func {half} {zero} {half} {half} p₁ p₂ = triv
+⊙₃-func {half} {zero} {half} {one} p₁ p₂ = triv
+⊙₃-func {half} {zero} {one} {zero} p₁ p₂ = triv
+⊙₃-func {half} {zero} {one} {half} p₁ p₂ = triv
+⊙₃-func {half} {zero} {one} {one} p₁ p₂ = triv
+⊙₃-func {half} {half} {zero} {zero} ()
+⊙₃-func {half} {half} {zero} {half} ()
+⊙₃-func {half} {half} {zero} {one} ()
+⊙₃-func {half} {half} {half} {zero} p₁ p₂ = p₂
+⊙₃-func {half} {half} {half} {half} p₁ p₂ = triv
+⊙₃-func {half} {half} {half} {one} p₁ p₂ = triv
+⊙₃-func {half} {half} {one} {zero} p₁ p₂ = p₂
+⊙₃-func {half} {half} {one} {half} p₁ p₂ = triv
+⊙₃-func {half} {half} {one} {one} p₁ p₂ = triv
+⊙₃-func {half} {one} {zero} {zero} ()
+⊙₃-func {half} {one} {zero} {half} ()
+⊙₃-func {half} {one} {zero} {one} p₁ p₂ = p₁
+⊙₃-func {half} {one} {half} {zero} p₁ p₂ = p₂
+⊙₃-func {half} {one} {half} {half} p₁ p₂ = p₂
+⊙₃-func {half} {one} {half} {one} p₁ p₂ = triv
+⊙₃-func {half} {one} {one} {zero} p₁ p₂ = p₂
+⊙₃-func {half} {one} {one} {half} p₁ p₂ = triv
+⊙₃-func {half} {one} {one} {one} p₁ p₂ = triv
+⊙₃-func {one} {zero} {zero} {zero} p₁ p₂ = triv
+⊙₃-func {one} {zero} {zero} {half} p₁ p₂ = triv
+⊙₃-func {one} {zero} {zero} {one} p₁ p₂ = triv
+⊙₃-func {one} {zero} {half} {zero} p₁ p₂ = triv
+⊙₃-func {one} {zero} {half} {half} p₁ p₂ = triv
+⊙₃-func {one} {zero} {half} {one} p₁ p₂ = triv
+⊙₃-func {one} {zero} {one} {zero} p₁ p₂ = triv
+⊙₃-func {one} {zero} {one} {half} p₁ p₂ = triv
+⊙₃-func {one} {zero} {one} {one} p₁ p₂ = triv
+⊙₃-func {one} {half} {zero} {zero} ()
+⊙₃-func {one} {half} {zero} {half} p₁ p₂ = p₁
+⊙₃-func {one} {half} {zero} {one} p₁ p₂ = p₁
+⊙₃-func {one} {half} {half} {zero} ()
+⊙₃-func {one} {half} {half} {half} p₁ p₂ = p₁
+⊙₃-func {one} {half} {half} {one} p₁ p₂ = triv
+⊙₃-func {one} {half} {one} {zero} p₁ p₂ = p₂
+⊙₃-func {one} {half} {one} {half} p₁ p₂ = triv
+⊙₃-func {one} {half} {one} {one} p₁ p₂ = triv
+⊙₃-func {one} {one} {zero} {zero} ()
+⊙₃-func {one} {one} {zero} {half} ()
+⊙₃-func {one} {one} {zero} {one} p₁ p₂ = p₁
+⊙₃-func {one} {one} {half} {zero} ()
+⊙₃-func {one} {one} {half} {half} ()
+⊙₃-func {one} {one} {half} {one} p₁ p₂ = triv
+⊙₃-func {one} {one} {one} {zero} p₁ p₂ = p₂
+⊙₃-func {one} {one} {one} {half} p₁ p₂ = triv
+⊙₃-func {one} {one} {one} {one} p₁ p₂ = triv
+
 land-func : {a b c d : Three} → a ≤₃ c → b ≤₃ d → (a ▷₃ b) ≤₃ (c ▷₃ d)
 land-func {zero} {zero} {zero} {zero} p1 p2 = triv
 land-func {zero} {zero} {zero} {half} p1 p2 = triv
@@ -193,6 +292,16 @@ land-func {one} {one} {half} {one} p1 p2 = triv
 land-func {one} {one} {one} {zero} p1 p2 = p2
 land-func {one} {one} {one} {half} p1 p2 = p2
 land-func {one} {one} {one} {one} p1 p2 = triv
+
+⊙₃-contract1 : ∀{a} → (a ⊙₃ a) ≤₃ a
+⊙₃-contract1 {zero} = triv
+⊙₃-contract1 {half} = triv
+⊙₃-contract1 {one} = triv
+
+⊙₃-contract2 : ∀{a} → a ≤₃ (a ⊙₃ a)
+⊙₃-contract2 {zero} = triv
+⊙₃-contract2 {half} = triv
+⊙₃-contract2 {one} = triv
 
 lchoice-contract1 : ∀{a} → (a ⊔₃ a) ≤₃ a
 lchoice-contract1 {zero} = triv

@@ -1473,3 +1473,22 @@ ctr4ᵢ {one} {one} {quater} x x₁ = x₁
 ctr4ᵢ {one} {one} {half} x x₁ = x₁
 ctr4ᵢ {one} {one} {one} x x₁ = triv
 
+_⊸₃_ : Three → Three → Three
+half ⊸₃ zero = zero
+half ⊸₃ half = half
+one ⊸₃ zero = zero
+one ⊸₃ half = zero
+_ ⊸₃ _ = one
+  
+_↼₃_ : Three → Three → Three
+zero ↼₃ half = zero
+zero ↼₃ one = zero
+half ↼₃ half = half
+half ↼₃ one = half
+_ ↼₃ _ = one
+
+_⇀₃_ : Three → Three → Three
+half ⇀₃ zero = zero
+one ⇀₃ zero = zero
+one ⇀₃ half = zero
+_ ⇀₃ _ = one

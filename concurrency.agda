@@ -164,6 +164,82 @@ choice-seq-dist-inv {U , X , α}{V , Y , β}{W , Z , γ} = choice-seq-dist-inv-a
 _⊙_ : Obj → Obj → Obj
 (U , X , α) ⊙ (V , Y , β) = (U × V) , (X × Y) , ⊙-rel α β
 
+_⊸ᵣ_ : ∀{U V X Y : Set} → (U → X → Three) → (V → Y → Three) → ((U → V) × (Y → X)) → U × Y → Three
+_⊸ᵣ_ α β (f , g) (u , y) = (α u (g y)) ⊸₃ (β (f u) y)
+
+_⊸_ : Obj → Obj → Obj
+(U , X , α) ⊸ (V , Y , β) = ((U → V) × (Y → X)) , (U × Y) , (α ⊸ᵣ β)
+
+curry₃ : {a b c : Three} → (a ⊗3 b) ≤3 c → a ≤3 (b ⊸₃ c)
+curry₃ {zero} {zero} {zero} p = triv
+curry₃ {zero} {zero} {half} p = triv
+curry₃ {zero} {zero} {one} p = triv
+curry₃ {zero} {half} {zero} p = triv
+curry₃ {zero} {half} {half} p = triv
+curry₃ {zero} {half} {one} p = triv
+curry₃ {zero} {one} {zero} p = triv
+curry₃ {zero} {one} {half} p = triv
+curry₃ {zero} {one} {one} p = triv
+curry₃ {half} {zero} {zero} p = triv
+curry₃ {half} {zero} {half} p = triv
+curry₃ {half} {zero} {one} p = triv
+curry₃ {half} {half} {zero} p = p
+curry₃ {half} {half} {half} p = triv
+curry₃ {half} {half} {one} p = triv
+curry₃ {half} {one} {zero} p = p
+curry₃ {half} {one} {half} p = p
+curry₃ {half} {one} {one} p = triv
+curry₃ {one} {zero} {zero} p = triv
+curry₃ {one} {zero} {half} p = triv
+curry₃ {one} {zero} {one} p = triv
+curry₃ {one} {half} {zero} p = p
+curry₃ {one} {half} {half} p = p
+curry₃ {one} {half} {one} p = triv
+curry₃ {one} {one} {zero} p = p
+curry₃ {one} {one} {half} p = p
+curry₃ {one} {one} {one} p = triv
+
+curry-inv₃ : {a b c : Three} → a ≤3 (b ⊸₃ c) → (a ⊗3 b) ≤3 c
+curry-inv₃ {zero} {zero} {zero} p = triv
+curry-inv₃ {zero} {zero} {half} p = triv
+curry-inv₃ {zero} {zero} {one} p = triv
+curry-inv₃ {zero} {half} {zero} p = triv
+curry-inv₃ {zero} {half} {half} p = triv
+curry-inv₃ {zero} {half} {one} p = triv
+curry-inv₃ {zero} {one} {zero} p = triv
+curry-inv₃ {zero} {one} {half} p = triv
+curry-inv₃ {zero} {one} {one} p = triv
+curry-inv₃ {half} {zero} {zero} p = triv
+curry-inv₃ {half} {zero} {half} p = triv
+curry-inv₃ {half} {zero} {one} p = triv
+curry-inv₃ {half} {half} {zero} p = p
+curry-inv₃ {half} {half} {half} p = triv
+curry-inv₃ {half} {half} {one} p = triv
+curry-inv₃ {half} {one} {zero} p = p
+curry-inv₃ {half} {one} {half} p = p
+curry-inv₃ {half} {one} {one} p = triv
+curry-inv₃ {one} {zero} {zero} p = triv
+curry-inv₃ {one} {zero} {half} p = triv
+curry-inv₃ {one} {zero} {one} p = triv
+curry-inv₃ {one} {half} {zero} p = p
+curry-inv₃ {one} {half} {half} p = p
+curry-inv₃ {one} {half} {one} p = triv
+curry-inv₃ {one} {one} {zero} p = p
+curry-inv₃ {one} {one} {half} p = p
+curry-inv₃ {one} {one} {one} p = triv
+
+curr : {X A B : Obj} → Hom (X ⊙ A) B → Hom X (A ⊸ B)
+curr {U , X , α}{V , Y , β}{Z , W , γ} (f , F , pf) = (λ u → (λ v → f (u , v)) , (λ w → snd (F w))) , ((λ p → fst (F (snd p))) , (λ {u} {y} → aux {u}{y}))
+ where
+   aux : {u : U} {y : V × W} → α u (fst (F (snd y))) ≤3 (β ⊸ᵣ γ) ((λ v → f (u , v)) , (λ w → snd (F w))) y
+   aux {u}{v , w} with pf {u , v}{w}
+   ... | pf' with F w
+   ... | x , y with α u x | β v y | γ (f (u , v)) w   
+   ... | a | b | c = curry₃ {a}{b}{c} pf'
+
+curr-inv : {X A B : Obj} → Hom X (A ⊸ B) → Hom (X ⊙ A) B
+curr-inv {U , X , α}{V , Y , β}{Z , W , γ} (f , F , pf) = (λ p → fst (f (fst p)) (snd p)) , ({!!} , {!!})
+
 -- Fails:
 -- Hom C A → Hom D B → Hom (C ⊙ D) (A ⊔ₒ B), implies if ⊔ₒ was right operator on the right, then left-rule for ⊙ and ▻ would fail.
 -- Hom A C → Hom B D → Hom (A ⊔ₒ B) (C ⊙ D)
