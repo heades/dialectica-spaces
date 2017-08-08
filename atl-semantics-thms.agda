@@ -12,6 +12,11 @@ not-same-half-zero ()
 not-same-zero-one : zero ≡ one → ⊥ {lzero}
 not-same-zero-one ()
 
+refl₃ : {a : Three} → a ≤₃ a
+refl₃ {zero} = triv
+refl₃ {half} = triv
+refl₃ {one} = triv
+
 ▷₃-sym : (∀{a b} → (a ▷₃ b) ≡ (b ▷₃ a)) → ⊥ {lzero}
 ▷₃-sym p = not-same-half-one (p {one}{half})
 
@@ -88,7 +93,7 @@ comp₃ {zero} {one} x {zero} = triv
 comp₃ {zero} {one} x {half} = triv
 comp₃ {zero} {one} x {one} = triv
 comp₃ {half} {zero} x {zero} = triv
-comp₃ {half} {zero} x {half} = x
+comp₃ {half} {zero} () {half}
 comp₃ {half} {zero} x {one} = x
 comp₃ {half} {half} x {zero} = triv
 comp₃ {half} {half} x {half} = triv
@@ -172,20 +177,20 @@ comp₃ {one} {one} x {one} = triv
 ▷₃-func {half} {zero} {one} {zero} p1 p2 = triv
 ▷₃-func {half} {zero} {one} {half} p1 p2 = triv
 ▷₃-func {half} {zero} {one} {one} p1 p2 = triv
-▷₃-func {half} {half} {zero} {zero} p1 p2 = p1
-▷₃-func {half} {half} {zero} {half} p1 p2 = p1
-▷₃-func {half} {half} {zero} {one} p1 p2 = p1
+▷₃-func {half} {half} {zero} {zero} () ()
+▷₃-func {half} {half} {zero} {half} () p2
+▷₃-func {half} {half} {zero} {one} () p2
 ▷₃-func {half} {half} {half} {zero} p1 ()
 ▷₃-func {half} {half} {half} {half} p1 p2 = triv
 ▷₃-func {half} {half} {half} {one} p1 p2 = triv
-▷₃-func {half} {half} {one} {zero} p1 p2 = p2
+▷₃-func {half} {half} {one} {zero} p1 ()
 ▷₃-func {half} {half} {one} {half} p1 p2 = triv
 ▷₃-func {half} {half} {one} {one} p1 p2 = triv
 ▷₃-func {half} {one} {zero} {zero} p1 p2 = p1
 ▷₃-func {half} {one} {zero} {half} p1 p2 = p1
 ▷₃-func {half} {one} {zero} {one} () p2
 ▷₃-func {half} {one} {half} {zero} p1 p2 = p2
-▷₃-func {half} {one} {half} {half} p1 p2 = triv
+▷₃-func {half} {one} {half} {half} p1 ()
 ▷₃-func {half} {one} {half} {one} p1 p2 = triv
 ▷₃-func {half} {one} {one} {zero} p1 p2 = p2
 ▷₃-func {half} {one} {one} {half} p1 p2 = triv
@@ -582,54 +587,244 @@ trans₃ {one} {one} {one} p1 p2 = triv
 ▷₃-adj {one} {one} {half} p = triv
 ▷₃-adj {one} {one} {one} p = triv
 
-⊙₃-adj {zero} {half} {one} p = triv
-⊙₃-adj {zero} {one} {zero} p = triv
-⊙₃-adj {zero} {one} {half} p = triv
-⊙₃-adj {zero} {one} {one} p = triv
-⊙₃-adj {half} {zero} {zero} p = triv
-⊙₃-adj {half} {zero} {half} ()
-⊙₃-adj {half} {zero} {one} ()
-⊙₃-adj {half} {half} {zero} p = triv
-⊙₃-adj {half} {half} {half} p = triv
-⊙₃-adj {half} {half} {one} p = triv
-⊙₃-adj {half} {one} {zero} p = triv
-⊙₃-adj {half} {one} {half} p = triv
-⊙₃-adj {half} {one} {one} p = triv
-⊙₃-adj {one} {zero} {zero} p = triv
-⊙₃-adj {one} {zero} {half} ()
-⊙₃-adj {one} {zero} {one} ()
-⊙₃-adj {one} {half} {zero} p = triv
-⊙₃-adj {one} {half} {half} p = triv
-⊙₃-adj {one} {half} {one} p = triv
-⊙₃-adj {one} {one} {zero} p = triv
-⊙₃-adj {one} {one} {half} p = triv
-⊙₃-adj {one} {one} {one} p = triv
+λ₃ : {a : Three} → (a ⊗₃ I₃) ≤₃ a
+λ₃ {zero} = triv
+λ₃ {half} = triv
+λ₃ {one} = triv
 
-⊙₃-adj-inv : {a b y : Three} → y ≤₃ (a ⊸₃ b) → (a ⊙₃ y) ≤₃ b
-⊙₃-adj-inv {zero} {zero} {zero} p = triv
-⊙₃-adj-inv {zero} {zero} {half} p = triv
-⊙₃-adj-inv {zero} {zero} {one} p = triv
-⊙₃-adj-inv {zero} {half} {zero} p = triv
-⊙₃-adj-inv {zero} {half} {half} p = triv
-⊙₃-adj-inv {zero} {half} {one} p = triv
-⊙₃-adj-inv {zero} {one} {zero} p = triv
-⊙₃-adj-inv {zero} {one} {half} p = triv
-⊙₃-adj-inv {zero} {one} {one} p = triv
-⊙₃-adj-inv {half} {zero} {zero} p = triv
-⊙₃-adj-inv {half} {zero} {half} p = p
-⊙₃-adj-inv {half} {zero} {one} p = p
-⊙₃-adj-inv {half} {half} {zero} p = triv
-⊙₃-adj-inv {half} {half} {half} p = triv
-⊙₃-adj-inv {half} {half} {one} p = triv
-⊙₃-adj-inv {half} {one} {zero} p = triv
-⊙₃-adj-inv {half} {one} {half} p = triv
-⊙₃-adj-inv {half} {one} {one} p = triv
-⊙₃-adj-inv {one} {zero} {zero} p = triv
-⊙₃-adj-inv {one} {zero} {half} p = p
-⊙₃-adj-inv {one} {zero} {one} p = p
-⊙₃-adj-inv {one} {half} {zero} p = triv
-⊙₃-adj-inv {one} {half} {half} p = triv
-⊙₃-adj-inv {one} {half} {one} p = triv
-⊙₃-adj-inv {one} {one} {zero} p = triv
-⊙₃-adj-inv {one} {one} {half} p = triv
-⊙₃-adj-inv {one} {one} {one} p = triv
+λ₃-inv : {a : Three} → a ≤₃ (a ⊗₃ I₃)
+λ₃-inv {zero} = triv
+λ₃-inv {half} = triv
+λ₃-inv {one} = triv
+
+ρ₃ : {a : Three} → (I₃ ⊗₃ a) ≤₃ a
+ρ₃ {zero} = triv
+ρ₃ {half} = triv
+ρ₃ {one} = triv
+
+ρ₃-inv : {a : Three} → a ≤₃ (I₃ ⊗₃ a)
+ρ₃-inv {zero} = triv
+ρ₃-inv {half} = triv
+ρ₃-inv {one} = triv
+
+β₃ : {a b : Three} → (a ⊗₃ b) ≡ (b ⊗₃ a)
+β₃ {zero} {zero} = refl
+β₃ {zero} {half} = refl
+β₃ {zero} {one} = refl
+β₃ {half} {zero} = refl
+β₃ {half} {half} = refl
+β₃ {half} {one} = refl
+β₃ {one} {zero} = refl
+β₃ {one} {half} = refl
+β₃ {one} {one} = refl
+
+α₃ : {a b c : Three} → (a ⊗₃ b) ⊗₃ c ≡ a ⊗₃ (b ⊗₃ c)
+α₃ {zero} {zero} {zero} = refl
+α₃ {zero} {zero} {half} = refl
+α₃ {zero} {zero} {one} = refl
+α₃ {zero} {half} {zero} = refl
+α₃ {zero} {half} {half} = refl
+α₃ {zero} {half} {one} = refl
+α₃ {zero} {one} {zero} = refl
+α₃ {zero} {one} {half} = refl
+α₃ {zero} {one} {one} = refl
+α₃ {half} {zero} {zero} = refl
+α₃ {half} {zero} {half} = refl
+α₃ {half} {zero} {one} = refl
+α₃ {half} {half} {zero} = refl
+α₃ {half} {half} {half} = refl
+α₃ {half} {half} {one} = refl
+α₃ {half} {one} {zero} = refl
+α₃ {half} {one} {half} = refl
+α₃ {half} {one} {one} = refl
+α₃ {one} {zero} {zero} = refl
+α₃ {one} {zero} {half} = refl
+α₃ {one} {zero} {one} = refl
+α₃ {one} {half} {zero} = refl
+α₃ {one} {half} {half} = refl
+α₃ {one} {half} {one} = refl
+α₃ {one} {one} {zero} = refl
+α₃ {one} {one} {half} = refl
+α₃ {one} {one} {one} = refl
+
+⊗₃-func : {a b c d : Three} → a ≤₃ c → b ≤₃ d → (a ⊗₃ b) ≤₃ (c ⊗₃ d)
+⊗₃-func {zero} {zero} {zero} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {zero} {half} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {zero} {one} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {half} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {half} {half} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {half} {one} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {one} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {one} {half} p₁ p₂ = triv
+⊗₃-func {zero} {zero} {one} {one} p₁ p₂ = triv
+⊗₃-func {zero} {half} {zero} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {half} {zero} {half} p₁ p₂ = triv
+⊗₃-func {zero} {half} {zero} {one} p₁ p₂ = triv
+⊗₃-func {zero} {half} {half} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {half} {half} {half} p₁ p₂ = triv
+⊗₃-func {zero} {half} {half} {one} p₁ p₂ = triv
+⊗₃-func {zero} {half} {one} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {half} {one} {half} p₁ p₂ = triv
+⊗₃-func {zero} {half} {one} {one} p₁ p₂ = triv
+⊗₃-func {zero} {one} {zero} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {one} {zero} {half} p₁ p₂ = triv
+⊗₃-func {zero} {one} {zero} {one} p₁ p₂ = triv
+⊗₃-func {zero} {one} {half} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {one} {half} {half} p₁ p₂ = triv
+⊗₃-func {zero} {one} {half} {one} p₁ p₂ = triv
+⊗₃-func {zero} {one} {one} {zero} p₁ p₂ = triv
+⊗₃-func {zero} {one} {one} {half} p₁ p₂ = triv
+⊗₃-func {zero} {one} {one} {one} p₁ p₂ = triv
+⊗₃-func {half} {zero} {zero} {zero} p₁ p₂ = triv
+⊗₃-func {half} {zero} {zero} {half} p₁ p₂ = triv
+⊗₃-func {half} {zero} {zero} {one} p₁ p₂ = triv
+⊗₃-func {half} {zero} {half} {zero} p₁ p₂ = triv
+⊗₃-func {half} {zero} {half} {half} p₁ p₂ = triv
+⊗₃-func {half} {zero} {half} {one} p₁ p₂ = triv
+⊗₃-func {half} {zero} {one} {zero} p₁ p₂ = triv
+⊗₃-func {half} {zero} {one} {half} p₁ p₂ = triv
+⊗₃-func {half} {zero} {one} {one} p₁ p₂ = triv
+⊗₃-func {half} {half} {zero} {zero} () ()
+⊗₃-func {half} {half} {zero} {half} () p₂
+⊗₃-func {half} {half} {zero} {one} () p₂
+⊗₃-func {half} {half} {half} {zero} p₁ ()
+⊗₃-func {half} {half} {half} {half} p₁ p₂ = triv
+⊗₃-func {half} {half} {half} {one} p₁ p₂ = triv
+⊗₃-func {half} {half} {one} {zero} p₁ ()
+⊗₃-func {half} {half} {one} {half} p₁ p₂ = triv
+⊗₃-func {half} {half} {one} {one} p₁ p₂ = triv
+⊗₃-func {half} {one} {zero} {zero} () ()
+⊗₃-func {half} {one} {zero} {half} () ()
+⊗₃-func {half} {one} {zero} {one} () p₂
+⊗₃-func {half} {one} {half} {zero} p₁ ()
+⊗₃-func {half} {one} {half} {half} p₁ ()
+⊗₃-func {half} {one} {half} {one} p₁ p₂ = triv
+⊗₃-func {half} {one} {one} {zero} p₁ ()
+⊗₃-func {half} {one} {one} {half} p₁ p₂ = triv
+⊗₃-func {half} {one} {one} {one} p₁ p₂ = triv
+⊗₃-func {one} {zero} {zero} {zero} p₁ p₂ = triv
+⊗₃-func {one} {zero} {zero} {half} p₁ p₂ = triv
+⊗₃-func {one} {zero} {zero} {one} p₁ p₂ = triv
+⊗₃-func {one} {zero} {half} {zero} p₁ p₂ = triv
+⊗₃-func {one} {zero} {half} {half} p₁ p₂ = triv
+⊗₃-func {one} {zero} {half} {one} p₁ p₂ = triv
+⊗₃-func {one} {zero} {one} {zero} p₁ p₂ = triv
+⊗₃-func {one} {zero} {one} {half} p₁ p₂ = triv
+⊗₃-func {one} {zero} {one} {one} p₁ p₂ = triv
+⊗₃-func {one} {half} {zero} {zero} () ()
+⊗₃-func {one} {half} {zero} {half} () p₂
+⊗₃-func {one} {half} {zero} {one} () p₂
+⊗₃-func {one} {half} {half} {zero} () p₂
+⊗₃-func {one} {half} {half} {half} () p₂
+⊗₃-func {one} {half} {half} {one} () p₂
+⊗₃-func {one} {half} {one} {zero} p₁ ()
+⊗₃-func {one} {half} {one} {half} p₁ p₂ = triv
+⊗₃-func {one} {half} {one} {one} p₁ p₂ = triv
+⊗₃-func {one} {one} {zero} {zero} () ()
+⊗₃-func {one} {one} {zero} {half} () ()
+⊗₃-func {one} {one} {zero} {one} () p₂
+⊗₃-func {one} {one} {half} {zero} () ()
+⊗₃-func {one} {one} {half} {half} () ()
+⊗₃-func {one} {one} {half} {one} () p₂
+⊗₃-func {one} {one} {one} {zero} p₁ ()
+⊗₃-func {one} {one} {one} {half} p₁ p₂ = triv
+⊗₃-func {one} {one} {one} {one} p₁ p₂ = triv
+
+⊗₃-comp : {a b : Three} → a ≤₃ b → {c : Three} → (a ⊗₃ c) ≤₃ (b ⊗₃ c)
+⊗₃-comp {zero} {zero} p {zero} = triv
+⊗₃-comp {zero} {zero} p {half} = triv
+⊗₃-comp {zero} {zero} p {one} = triv
+⊗₃-comp {zero} {half} p {zero} = triv
+⊗₃-comp {zero} {half} p {half} = triv
+⊗₃-comp {zero} {half} p {one} = triv
+⊗₃-comp {zero} {one} p {zero} = triv
+⊗₃-comp {zero} {one} p {half} = triv
+⊗₃-comp {zero} {one} p {one} = triv
+⊗₃-comp {half} {zero} p {zero} = triv
+⊗₃-comp {half} {zero} () {half}
+⊗₃-comp {half} {zero} () {one}
+⊗₃-comp {half} {half} p {zero} = triv
+⊗₃-comp {half} {half} p {half} = triv
+⊗₃-comp {half} {half} p {one} = triv
+⊗₃-comp {half} {one} p {zero} = triv
+⊗₃-comp {half} {one} p {half} = triv
+⊗₃-comp {half} {one} p {one} = triv
+⊗₃-comp {one} {zero} p {zero} = triv
+⊗₃-comp {one} {zero} () {half}
+⊗₃-comp {one} {zero} () {one}
+⊗₃-comp {one} {half} p {zero} = triv
+⊗₃-comp {one} {half} () {half}
+⊗₃-comp {one} {half} p {one} = triv
+⊗₃-comp {one} {one} p {zero} = triv
+⊗₃-comp {one} {one} p {half} = triv
+⊗₃-comp {one} {one} p {one} = triv
+
+⊗₃-contract : {a : Three} → (a ⊗₃ a) ≡ a
+⊗₃-contract {zero} = refl
+⊗₃-contract {half} = refl
+⊗₃-contract {one} = refl
+
+⊗₃-adj : {a b y : Three} → (a ⊗₃ y) ≤₃ b → y ≤₃ (a ⊸₃ b)
+⊗₃-adj {zero} {zero} {zero} p = triv
+⊗₃-adj {zero} {zero} {half} p = triv
+⊗₃-adj {zero} {zero} {one} p = triv
+⊗₃-adj {zero} {half} {zero} p = triv
+⊗₃-adj {zero} {half} {half} p = triv
+⊗₃-adj {zero} {half} {one} p = triv
+⊗₃-adj {zero} {one} {zero} p = triv
+⊗₃-adj {zero} {one} {half} p = triv
+⊗₃-adj {zero} {one} {one} p = triv
+⊗₃-adj {half} {zero} {zero} p = triv
+⊗₃-adj {half} {zero} {half} ()
+⊗₃-adj {half} {zero} {one} ()
+⊗₃-adj {half} {half} {zero} p = triv
+⊗₃-adj {half} {half} {half} p = triv
+⊗₃-adj {half} {half} {one} ()
+⊗₃-adj {half} {one} {zero} p = triv
+⊗₃-adj {half} {one} {half} p = triv
+⊗₃-adj {half} {one} {one} p = triv
+⊗₃-adj {one} {zero} {zero} p = triv
+⊗₃-adj {one} {zero} {half} ()
+⊗₃-adj {one} {zero} {one} ()
+⊗₃-adj {one} {half} {zero} p = triv
+⊗₃-adj {one} {half} {half} ()
+⊗₃-adj {one} {half} {one} ()
+⊗₃-adj {one} {one} {zero} p = triv
+⊗₃-adj {one} {one} {half} p = triv
+⊗₃-adj {one} {one} {one} p = triv
+
+⊗₃-adj-inv : {a b y : Three} → y ≤₃ (a ⊸₃ b) → (y ⊗₃ a) ≤₃ b
+⊗₃-adj-inv {zero} {zero} {zero} p = triv
+⊗₃-adj-inv {zero} {zero} {half} p = triv
+⊗₃-adj-inv {zero} {zero} {one} p = triv
+⊗₃-adj-inv {zero} {half} {zero} p = triv
+⊗₃-adj-inv {zero} {half} {half} p = triv
+⊗₃-adj-inv {zero} {half} {one} p = triv
+⊗₃-adj-inv {zero} {one} {zero} p = triv
+⊗₃-adj-inv {zero} {one} {half} p = triv
+⊗₃-adj-inv {zero} {one} {one} p = triv
+⊗₃-adj-inv {half} {zero} {zero} p = triv
+⊗₃-adj-inv {half} {zero} {half} ()
+⊗₃-adj-inv {half} {zero} {one} ()
+⊗₃-adj-inv {half} {half} {zero} p = triv
+⊗₃-adj-inv {half} {half} {half} p = triv
+⊗₃-adj-inv {half} {half} {one} ()
+⊗₃-adj-inv {half} {one} {zero} p = triv
+⊗₃-adj-inv {half} {one} {half} p = triv
+⊗₃-adj-inv {half} {one} {one} p = triv
+⊗₃-adj-inv {one} {zero} {zero} p = triv
+⊗₃-adj-inv {one} {zero} {half} ()
+⊗₃-adj-inv {one} {zero} {one} ()
+⊗₃-adj-inv {one} {half} {zero} p = triv
+⊗₃-adj-inv {one} {half} {half} ()
+⊗₃-adj-inv {one} {half} {one} ()
+⊗₃-adj-inv {one} {one} {zero} p = triv
+⊗₃-adj-inv {one} {one} {half} p = triv
+⊗₃-adj-inv {one} {one} {one} p = triv
+
+⊗₃-app : {a b : Three} → ((a ⊸₃ b) ⊗₃ a) ≤₃ b
+⊗₃-app {a}{b} = ⊗₃-adj-inv {a} {b} {a ⊸₃ b} (refl₃ {a ⊸₃ b})
+
+point₃ : ∀{a b} → I₃ ≤₃ (a ⊸₃ b) → a ≤₃ b
+point₃ {a}{b} p with ⊗₃-adj-inv {a}{b}{I₃} p | ρ₃-inv {a}
+... | r₁ | r₂ =  trans₃ {a}{I₃ ⊗₃ a}{b} r₂ r₁

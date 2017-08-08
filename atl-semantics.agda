@@ -22,18 +22,29 @@ one ≤₃ zero = ⊥
 one ≤₃ half = ⊥
 _ ≤₃ _ = ⊤
 
+_⊗₃_ : Three → Three → Three
+half ⊗₃ half = half
+half ⊗₃ one = one
+one ⊗₃ half = one
+one ⊗₃ one = one
+_ ⊗₃ _ = zero
+
+I₃ : Three
+I₃ = half
+
+_⊸₃_ : Three → Three → Three
+half ⊸₃ zero = zero
+one ⊸₃ zero = zero
+one ⊸₃ half = zero
+half ⊸₃ half = half
+_ ⊸₃ _ = one
+
 _⊙₃_ : Three → Three → Three
 half ⊙₃ half = half
 half ⊙₃ one = half
 one ⊙₃ half = half
 one ⊙₃ one = half
 _ ⊙₃ _ = zero
-
-_⊸₃_ : Three → Three → Three
-half ⊸₃ zero = zero
-one ⊸₃ zero = zero
-one ⊸₃ half = one
-_ ⊸₃ _ = one
 
 _▷₃_ : Three → Three → Three
 zero ▷₃ one = one
