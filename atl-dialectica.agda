@@ -7,26 +7,8 @@
 module ATL-Dialectica where
 
 open import prelude
-open import atl-lineale
-open import atl-lineale-thms
-
--- module DialSets-local-defs where
---   -----------------------------------------------------------------------
---   -- Initial local definitions to make reading types easier            --
---   -----------------------------------------------------------------------
---   l-pf : Lineale L
---   l-pf = a-lineale al-pf
-  
---   ∅ : L
---   ∅ = add-unit al-pf
-
---   _≤L_ : L → L → Set
---   x ≤L y = (rel (proset (mproset l-pf))) x y
-
---   reflL : {a : L} → a ≤L a
---   reflL = prefl (proset (mproset l-pf))
-  
--- open DialSets-local-defs
+open import atl-semantics
+open import atl-semantics-thms
 
 -----------------------------------------------------------------------
 -- We have a category                                                --
@@ -64,14 +46,9 @@ _○_ = comp
 Homₐ :  {A' A B B' : Obj} → Hom A' A → Hom B B' → Hom A B → Hom A' B'
 Homₐ f h g = comp f (comp g h)
 
-refl3 : {a : Three} → a ≤₃ a
-refl3 {zero} = triv
-refl3 {half} = triv
-refl3 {one} = triv
-
 -- The identity function:
 id : {A : Obj} → Hom A A 
-id {(U , V , α)} = (id-set , id-set , (λ {u} {y} → refl3 {α u y}))
+id {(U , V , α)} = (id-set , id-set , (λ {u} {y} → refl₃ {α u y}))
 
 -- In this formalization we will only worry about proving that the
 -- data of morphisms are equivalent, and not worry about the morphism
@@ -125,39 +102,47 @@ _⊙ᵣ_ α β (u , v) (x , y) = (α u x) ⊙₃ (β v y)
 
 _⊙_ : (A B : Obj) → Obj
 (U , X , α) ⊙ (V , Y , β) = ((U × V) , (X × Y) , α ⊙ᵣ β)
-
-F⊙ : ∀{S Z W T V X U Y : Set}{f : U → W}{F : Z → X}{g : V → S}{G : T → Y} → (S → Z) × (W → T) → (V → X) × (U → Y)
-F⊙ {f = f}{F}{g}{G} (h₁ , h₂) = (λ v → F(h₁ (g v))) , (λ u → G(h₂ (f u)))
   
 _⊙ₐ_ : {A B C D : Obj} → Hom A C → Hom B D → Hom (A ⊙ B) (C ⊙ D)
-_⊙ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁) (g , G , p₂) = ⟨ f , g ⟩ , {!!} , {!!} -- (λ {u y} → cond {u}{y})
+_⊙ₐ_ {(U , X , α)}{(V , Y , β)}{(W , Z , γ)}{(S , T , δ)} (f , F , p₁) (g , G , p₂) = ⟨ f , g ⟩ , func-× F G , (λ {p₁}{p₂} → cond {p₁}{p₂})
  where
-  -- cond : {u : Σ U (λ x → V)} {y : Σ (S → Z) (λ x → W → T)} →
-  --     ((α ⊙ᵣ β) u (F⊙ {f = f}{F}{g}{G} y)) ≤₃ ((γ ⊙ᵣ δ) (⟨ f , g ⟩ u) y)
-  -- cond {u , v}{h , j} = ⊙₃-func {α u (F (h (g v)))}{β v (G (j ( f u)))}{γ (f u) (h (g v))}{δ (g v) (j (f u))} p₁ p₂
+   cond : {u : U × V} {y : Z × T} → (α ⊙ᵣ β) u (func-× F G y) ≤₃ (γ ⊙ᵣ δ) (⟨ f , g ⟩ u) y
+   cond {u , v}{z , t} with p₁ {u}{z} | p₂ {v}{t}
+   ... | r₁ | r₂ = ⊙₃-func {α u (F z)}{β v (G t)}{γ (f u) z}{δ (g v) t} r₁ r₂
 
-{-
-seq-rel : ∀{U X V Y : Set} → (U → X → Three) → (V → Y → Three) → (U × V) → (X × Y) → Three
-seq-rel α β (u , v) (x , y) = (α u x) ▷₃ (β v y)
+⊙-α : {A B C : Obj} → Hom ((A ⊙ B) ⊙ C) (A ⊙ (B ⊙ C))
+⊙-α {U , X , α}{V , Y , β}{W , Z , γ} = lr-assoc-× , (rl-assoc-× , (λ {p₁}{p₂} → cond {p₁}{p₂}))
+ where
+   cond : {u : (U × V) × W} {y : X × Y × Z} → ((α ⊙ᵣ β) ⊙ᵣ γ) u (rl-assoc-× y) ≤₃ (α ⊙ᵣ (β ⊙ᵣ γ)) (lr-assoc-× u) y
+   cond {(u , v) , w}{x , y , z} = fst (iso₃-inv (⊙₃-assoc {α u x}{β v y}{γ w z}))
+
+⊙-β : {A B : Obj} → Hom (A ⊙ B) (B ⊙ A)
+⊙-β {U , X , α}{V , Y , β} = twist-× , (twist-× , (λ {p₁}{p₂} → cond {p₁}{p₂}))
+ where
+  cond : {u : U × V} {y : Y × X} → (α ⊙ᵣ β) u (twist-× y) ≤₃ (β ⊙ᵣ α) (twist-× u) y
+  cond {u , v}{y , x} = fst (iso₃-inv (⊙₃-sym {α u x}{β v y}))
+
+_▷ᵣ_ : ∀{U X V Y : Set} → (U → X → Three) → (V → Y → Three) → (U × V) → (X × Y) → Three
+_▷ᵣ_ α β (u , v) (x , y) = (α u x) ▷₃ (β v y)
 
 _▷_ : Obj → Obj → Obj
-(U , X , α) ▷ (V , Y , β) = (U × V) , (X × Y) , seq-rel α β
+(U , X , α) ▷ (V , Y , β) = (U × V) , (X × Y) , α ▷ᵣ β
 
-seq-func : {A B C D : Obj} → Hom A C → Hom B D → Hom (A ▷ B) (C ▷ D)
-seq-func {U , X , α} {V , Y , β} {W , Z , γ} {M , T , φ} (f , F , p1) (g , G , p2) = (prod-func f g) , (prod-func F G , (λ {u : U × V}{y : Z × T} → aux {u}{y}))
+_▷ₐ_ : {A B C D : Obj} → Hom A C → Hom B D → Hom (A ▷ B) (C ▷ D)
+_▷ₐ_ {U , X , α} {V , Y , β} {W , Z , γ} {M , T , φ} (f , F , p1) (g , G , p2) = (prod-func f g) , (prod-func F G , (λ {u : U × V}{y : Z × T} → aux {u}{y}))
  where
    prod-func : {U V W M : Set} → (U → W) → (V → M) → U × V → W × M
    prod-func f g ( u , v ) = (f u , g v)
 
-   aux : {u : U × V} {y : Z × T} → seq-rel α β u (prod-func F G y) ≤₃ seq-rel γ φ (prod-func f g u) y
-   aux {u , v}{z , t} = land-func {α u (F z)} {β v (G t)} {γ (f u) z} {φ (g v) t} p1 p2
+   aux : {u : U × V} {y : Z × T} → _▷ᵣ_ α β u (prod-func F G y) ≤₃ _▷ᵣ_ γ φ (prod-func f g u) y
+   aux {u , v}{z , t} = ▷₃-func {α u (F z)}{β v (G t)}{γ (f u) z}{φ (g v) t} (p1 {u}{z}) (p2 {v}{t})
 
-⊙-ex : {A B : Obj} → Hom (A ⊙ B) (B ⊙ A)
-⊙-ex {U , X , α}{V , Y , β} = (λ p → snd p , fst p) , ((λ p → snd p , fst p)) , (λ {p₁} {p₂} → aux {p₁}{p₂})
+▷-α : {A B C : Obj} → Hom ((A ▷ B) ▷ C) (A ▷ (B ▷ C))
+▷-α {U , X , α}{V , Y , β}{W , Z , γ} = lr-assoc-× , (rl-assoc-× , (λ {p₁}{p₂} → cond {p₁}{p₂}))
  where
-  aux : {u : U × V} {y : (U → Y) × (V → X)} → (α ⊙ᵣ β) u (snd y , fst y) ≤₃ (β ⊙ᵣ α) (snd u , fst u) y
-  aux {u , v}{h , j} = ⊙-symm₃ {α u (j v)}{β v (h u)}
-   
+   cond : {u : (U × V) × W} {y : X × Y × Z} → ((α ▷ᵣ β) ▷ᵣ γ) u (rl-assoc-× y) ≤₃ (α ▷ᵣ (β ▷ᵣ γ)) (lr-assoc-× u) y
+   cond {(u , v) , w}{x , y , z} = snd (iso₃-inv (▷₃-assoc {α u x}{β v y}{γ w z}))
+
 _⊔ᵣ_ : {U V X Y : Set} → (U → X → Three) → (V → Y → Three) → U ⊎ V → X ⊎ Y → Three
 _⊔ᵣ_ α β (inj₁ u) (inj₁ x) = α u x
 _⊔ᵣ_ α β (inj₁ u) (inj₂ y) = zero
@@ -167,6 +152,15 @@ _⊔ᵣ_ α β (inj₂ v) (inj₂ y) = β v y
 _⊔ₒ_ : Obj → Obj → Obj
 _⊔ₒ_ (U , X , α) (V , Y , β) = (U ⊎ V) , (X ⊎ Y) , α ⊔ᵣ β
 
+_⊔ₐ_ : {A C B D : Obj} → Hom A C → Hom B D → Hom (A ⊔ₒ B) (C ⊔ₒ D)
+_⊔ₐ_ {U , X , α} {V , Y , β} {W , Z , γ} {R , S , φ} (f , F , F-pf) (g , G , G-pf) = ⊎-map f g , (⊎-map F G , (λ {u}{v} → cond {u}{v}))
+ where
+   cond : {u : U ⊎ W} {y : Y ⊎ S} → (α ⊔ᵣ γ) u (⊎-map F G y) ≤₃ (β ⊔ᵣ φ) (⊎-map f g u) y
+   cond {inj₁ u} {inj₁ y} = F-pf
+   cond {inj₁ u} {inj₂ s} = triv
+   cond {inj₂ w} {inj₁ y} = triv
+   cond {inj₂ w} {inj₂ s} = G-pf
+   
 choose-assoc : ∀{A B C} → Hom (A ⊔ₒ (B ⊔ₒ C)) ((A ⊔ₒ B) ⊔ₒ C)
 choose-assoc {U , X , α}{V , Y , β}{W , Z , γ} = ⊎-assoc , ⊎-assoc-inv , (λ {x y} → cond {x}{y})
  where
@@ -236,12 +230,12 @@ choice-seq-dist {U , X , α}{V , Y , β}{W , Z , γ} = choice-seq-dist-aux₁ , 
  where
   cond : {u : Σ (U ⊎ V) (λ x → W)}
       {y : Σ X (λ x → Z) ⊎ Σ Y (λ x → Z)} →
-      seq-rel (_⊔ᵣ_ α β) γ u (choice-seq-dist-aux₂ y)
+      _▷ᵣ_ (_⊔ᵣ_ α β) γ u (choice-seq-dist-aux₂ y)
       ≤₃
-      _⊔ᵣ_ (seq-rel α γ) (seq-rel β γ) (choice-seq-dist-aux₁ u) y
+      _⊔ᵣ_ (_▷ᵣ_ α γ) (_▷ᵣ_ β γ) (choice-seq-dist-aux₁ u) y
   cond {inj₁ u , w} {inj₁ (a , b)} = refl₃ {α u a ▷₃ γ w b}
-  cond {inj₁ u , w} {inj₂ (a , b)} = triv
-  cond {inj₂ u , w} {inj₁ (a , b)} = triv
+  cond {inj₁ u , w} {inj₂ (a , b)} = ▷₃-zero {γ w b}
+  cond {inj₂ u , w} {inj₁ (a , b)} = ▷₃-zero {γ w b}
   cond {inj₂ u , w} {inj₂ (a , b)} = refl₃ {β u a ▷₃ γ w b}
 
 choice-seq-dist-inv-aux₁ : {U W V : Set} → Σ U (λ x → W) ⊎ Σ V (λ x → W) → Σ (U ⊎ V) (λ x → W)
@@ -257,9 +251,9 @@ choice-seq-dist-inv {U , X , α}{V , Y , β}{W , Z , γ} = choice-seq-dist-inv-a
  where  
   cond : {u : Σ U (λ x → W) ⊎ Σ V (λ x → W)}
       {y : Σ (X ⊎ Y) (λ x → Z)} →
-      _⊔ᵣ_ (seq-rel α γ) (seq-rel β γ) u (choice-seq-dist-inv-aux₂ y)
+      _⊔ᵣ_ (_▷ᵣ_ α γ) (_▷ᵣ_ β γ) u (choice-seq-dist-inv-aux₂ y)
       ≤₃
-      seq-rel
+      _▷ᵣ_
       (_⊔ᵣ_ α β) γ (choice-seq-dist-inv-aux₁ u) y
   cond {inj₁ (a , b)} {inj₁ x , y} = refl₃ {α a x ▷₃ γ b y}
   cond {inj₁ (a , b)} {inj₂ x , y} = triv
@@ -288,18 +282,104 @@ choice-seq-dist-iso₂ {U , X , α}{V , Y , β}{W , Z , γ} = ext-set aux₁ , e
    aux₂ {inj₁ (a , b)} = refl
    aux₂ {inj₂ (a , b)} = refl
 
-choice-para-dist-aux₁ : {U V W : Set} → (U ⊎ V) × W → U × W ⊎ V × W
-choice-para-dist-aux₁ (inj₁ a , b) = inj₁ (a , b)
-choice-para-dist-aux₁ (inj₂ a , b) = inj₂ (a , b)
+choice-para-distr-aux₁ : {U V W : Set} → (U ⊎ V) × W → U × W ⊎ V × W
+choice-para-distr-aux₁ {U} {V} {W} (inj₁ u , w) = inj₁ (u , w)
+choice-para-distr-aux₁ {U} {V} {W} (inj₂ v , w) = inj₂ (v , w)
 
-choice-para-dist-aux₂ : {U V W X Y Z : Set} → (W → X) × (U → Z) ⊎ (W → Y) × (V → Z) → (W → X ⊎ Y) × (U ⊎ V → Z)
-choice-para-dist-aux₂ (inj₁ (f , h)) = (λ w → inj₁ (f w)) , {!!}
-choice-para-dist-aux₂ (inj₂ (g , j)) = {!!}
+choice-para-distr-aux₂ : {X Z Y : Set} → X × Z ⊎ Y × Z → (X ⊎ Y) × Z
+choice-para-distr-aux₂ {X} {Z} {Y} (inj₁ (x , z)) = inj₁ x , z
+choice-para-distr-aux₂ {X} {Z} {Y} (inj₂ (y , z)) = inj₂ y , z
 
-choice-para-dist : {A B C : Obj} → Hom ((A ⊔ₒ B) ⊙ C) ((A ⊙ C) ⊔ₒ (B ⊙ C))
-choice-para-dist {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-dist-aux₁ , choice-para-dist-aux₂ , {!!}
+choice-para-distr : {A B C : Obj} → Hom ((A ⊔ₒ B) ⊙ C) ((A ⊙ C) ⊔ₒ (B ⊙ C))
+choice-para-distr {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-distr-aux₁ , (choice-para-distr-aux₂ , (λ {u y} → cond {u}{y}))
+ where
+  cond : {u : (U ⊎ V) × W} {y : X × Z ⊎ Y × Z} → ((α ⊔ᵣ β) ⊙ᵣ γ) u (choice-para-distr-aux₂ y) ≤₃ ((α ⊙ᵣ γ) ⊔ᵣ (β ⊙ᵣ γ)) (choice-para-distr-aux₁ u) y
+  cond {inj₁ u , w} {inj₁ (x , z)} =  refl₃ {α u x ⊙₃ γ w z} 
+  cond {inj₁ u , w} {inj₂ (y , z)} = triv
+  cond {inj₂ v , w} {inj₁ (x , z)} = triv
+  cond {inj₂ v , w} {inj₂ (y , z)} = refl₃ {β v y ⊙₃ γ w z}
 
+choice-para-distr-inv-aux₁ : {U W V : Set} → U × W ⊎ V × W → (U ⊎ V) × W
+choice-para-distr-inv-aux₁ {U} {W} {V} (inj₁ (u , w)) = (inj₁ u) , w
+choice-para-distr-inv-aux₁ {U} {W} {V} (inj₂ (v , w)) = (inj₂ v) , w
 
+choice-para-distr-inv-aux₂ : {X Y Z : Set} → (X ⊎ Y) × Z → X × Z ⊎ Y × Z
+choice-para-distr-inv-aux₂ {X} {Y} {Z} (inj₁ x , z) = inj₁ (x , z)
+choice-para-distr-inv-aux₂ {X} {Y} {Z} (inj₂ y , z) = inj₂ (y , z)
+
+choice-para-distr-inv : {A B C : Obj} → Hom ((A ⊙ C) ⊔ₒ (B ⊙ C)) ((A ⊔ₒ B) ⊙ C)
+choice-para-distr-inv {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-distr-inv-aux₁ , (choice-para-distr-inv-aux₂ , (λ {u y} → cond {u}{y}))
+ where
+   cond : {u : U × W ⊎ V × W} {y : (X ⊎ Y) × Z} → ((α ⊙ᵣ γ) ⊔ᵣ (β ⊙ᵣ γ)) u (choice-para-distr-inv-aux₂ y) ≤₃ ((α ⊔ᵣ β) ⊙ᵣ γ) (choice-para-distr-inv-aux₁ u) y
+   cond {inj₁ (u , w)} {inj₁ x , z} = refl₃ {α u x ⊙₃ γ w z} 
+   cond {inj₁ (v , w)} {inj₂ y , z} = triv
+   cond {inj₂ (u , w)} {inj₁ x , z} = triv
+   cond {inj₂ (v , w)} {inj₂ y , z} = refl₃ {β v y ⊙₃ γ w z}
+
+choice-para-distr-iso₁ : {A B C : Obj} → choice-para-distr {A}{B}{C} ○ choice-para-distr-inv {A}{B}{C} ≡h id {(A ⊔ₒ B) ⊙ C}
+choice-para-distr-iso₁ {U , X , α}{V , Y , β}{W , Z , γ} = (ext-set aux₁) , ext-set aux₂
+ where
+  aux₁ : {a : (U ⊎ V) × W} → (choice-para-distr-inv-aux₁ ∘ choice-para-distr-aux₁) a ≡ id-set a
+  aux₁ {inj₁ u , w} = refl
+  aux₁ {inj₂ v , w} = refl
+
+  aux₂ : {a : (X ⊎ Y) × Z} → (choice-para-distr-aux₂ ∘ choice-para-distr-inv-aux₂) a ≡ id-set a
+  aux₂ {inj₁ x , z} = refl
+  aux₂ {inj₂ y , z} = refl
+
+choice-para-distr-iso₂ : {A B C : Obj} → choice-para-distr-inv {A}{B}{C} ○ choice-para-distr {A}{B}{C} ≡h id {(A ⊙ C) ⊔ₒ (B ⊙ C)}
+choice-para-distr-iso₂ {U , X , α}{V , Y , β}{W , Z , γ} = (ext-set aux₁) , ext-set aux₂
+ where
+  aux₁ : {a : U × W ⊎ V × W} → (choice-para-distr-aux₁ ∘ choice-para-distr-inv-aux₁) a ≡ id-set a
+  aux₁ {inj₁ (u , w)} = refl
+  aux₁ {inj₂ (v , w)} = refl
+
+  aux₂ : {a : X × Z ⊎ Y × Z} → (choice-para-distr-inv-aux₂ ∘ choice-para-distr-aux₂) a ≡ id-set a
+  aux₂ {inj₁ (x , z)} = refl
+  aux₂ {inj₂ (y , z)} = refl
+
+choice-para-distr-nat : {A A' B B' C C' : Obj}
+  → (f : Hom A A')
+  → (g : Hom B B')
+  → (h : Hom C C')
+  → ((f ⊔ₐ g) ⊙ₐ h) ○ choice-para-distr {A'}{B'}{C'} ≡h choice-para-distr {A}{B}{C} ○ ((f ⊙ₐ h) ⊔ₐ (g ⊙ₐ h))
+choice-para-distr-nat {U , X , α}{U' , X' , α'}{V , Y , β}{V' , Y' , β'}{W , Z , γ}{W' , Z' , γ'} (f , F , F-pf) (g , G , G-pf) (h , H , H-pf) = (ext-set aux₁) , ext-set (λ {a} → aux₂ {a})
+ where
+  aux₁ : {a : (U ⊎ V) × W} → (choice-para-distr-aux₁ ∘ ⟨ ⊎-map f g , h ⟩) a ≡ (⊎-map ⟨ f , h ⟩ ⟨ g , h ⟩ ∘ choice-para-distr-aux₁) a
+  aux₁ {inj₁ u , w} = refl
+  aux₁ {inj₂ v , w} = refl
+
+  aux₂ : {a : X' × Z' ⊎ Y' × Z'} → (func-× (⊎-map F G) H ∘ choice-para-distr-aux₂) a ≡ (choice-para-distr-aux₂ ∘ ⊎-map (func-× F H) (func-× G H)) a
+  aux₂ {inj₁ (x' , z')} = refl
+  aux₂ {inj₂ (y' , z')} = refl
+
+choice-para-distl-aux₁ : {U V W : Set} → U × (V ⊎ W) → U × V ⊎ U × W
+choice-para-distl-aux₁ {U} {V} {W} (u , inj₁ v) = inj₁ (u , v)
+choice-para-distl-aux₁ {U} {V} {W} (u , inj₂ w) = inj₂ (u , w)
+
+choice-para-distl-aux₂ : {X Y Z : Set} → X × Y ⊎ X × Z → X × (Y ⊎ Z)
+choice-para-distl-aux₂ {X} {Y} {Z} (inj₁ (x , y)) = x , inj₁ y
+choice-para-distl-aux₂ {X} {Y} {Z} (inj₂ (x , z)) = x , inj₂ z
+
+choice-para-distl : {A B C : Obj} → Hom (A ⊙ (B ⊔ₒ C)) ((A ⊙ B) ⊔ₒ (A ⊙ C))
+choice-para-distl {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-distl-aux₁ , (choice-para-distl-aux₂ , (λ {u}{v} → cond {u}{v}))
+ where
+   cond : {u : U × (V ⊎ W)} {y : X × Y ⊎ X × Z} → (α ⊙ᵣ (β ⊔ᵣ γ)) u (choice-para-distl-aux₂ y) ≤₃ ((α ⊙ᵣ β) ⊔ᵣ (α ⊙ᵣ γ)) (choice-para-distl-aux₁ u) y
+   cond {u , inj₁ v} {inj₁ (x , y)} = refl₃ {α u x ⊙₃ β v y}
+   cond {u , inj₁ v} {inj₂ (x , z)} = ⊙₃-zero {α u x}
+   cond {u , inj₂ w} {inj₁ (x , y)} = ⊙₃-zero {α u x}
+   cond {u , inj₂ w} {inj₂ (x , z)} = refl₃ {α u x ⊙₃ γ w z}
+
+choice-seq-distl : {A B C : Obj} → Hom (A ▷ (B ⊔ₒ C)) ((A ▷ B) ⊔ₒ (A ▷ C))
+choice-seq-distl {U , X , α}{V , Y , β}{W , Z , γ} = choice-para-distl-aux₁ , (choice-para-distl-aux₂ , {!!})
+ where
+   cond : {u : U × (V ⊎ W)} {y : X × Y ⊎ X × Z} → (α ▷ᵣ (β ⊔ᵣ γ)) u (choice-para-distl-aux₂ y) ≤₃ ((α ▷ᵣ β) ⊔ᵣ (α ▷ᵣ γ)) (choice-para-distl-aux₁ u) y
+   cond {u , inj₁ v} {inj₁ (x , y)} = refl₃ {α u x ▷₃ β v y}
+   cond {u , inj₁ v} {inj₂ (x , z)} = {!!}
+   cond {u , inj₂ w} {inj₁ (x , y)} = {!!}
+   cond {u , inj₂ w} {inj₂ (x , z)} = refl₃ {α u x ▷₃ γ w z}
+
+{-
 -- -----------------------------------------------------------------------
 -- -- The SMCC Structure                                                --
 -- -----------------------------------------------------------------------

@@ -47,10 +47,14 @@ one ⊙₃ one = half
 _ ⊙₃ _ = zero
 
 _▷₃_ : Three → Three → Three
-zero ▷₃ one = one
-half ▷₃ one = one
-one ▷₃ one = one
-_ ▷₃ _ = half
+half ▷₃ one = half
+one ▷₃ half = half
+half ▷₃ half = half
+one ▷₃ one = half
+zero ▷₃ zero = zero
+one ▷₃ zero = half
+half ▷₃ zero = half
+_ ▷₃ _ = zero
 
 _⇀₃_ : Three → Three → Three
 half ⇀₃ zero = zero
